@@ -32,3 +32,11 @@ Runner/GeneratedPluginRegistrant.*
 !default.mode2v3
 !default.pbxuser
 !default.perspectivev3
+
+# Sensitive files
+GoogleService-Info.plist
+*.p12
+*.cer
+*.key
+*.pem
+fastlane/report.xml

@@ -43,3 +43,41 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Sensitive files - keep out of git
+# Environment files
+.env
+.env.*
+
+# Local developer properties
+local.properties
+key.properties
+
+# Android/iOS keys and service files
+**/*.jks
+**/*.keystore
+*.keystore
+google-services.json
+GoogleService-Info.plist
+
+# PEM / private keys
+*.pem
+*.key
+*.cer
+
+# Fastlane credentials
+/fastlane/storage/
+fastlane/report.xml
+fastlane/Matchfile
+
+# Secrets and credentials
+secrets.yaml
+credentials.yaml
+*.secret
+
+# VS Code workspace (may contain secrets in launch.json)
+.vscode/
+
+# macOS
+.envrc
+

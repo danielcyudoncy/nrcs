@@ -5,3 +5,9 @@
 # Xcode-related
 **/dgph
 **/xcuserdata/
+
+# Sensitive files
+*.p12
+*.key
+*.pem
+GoogleService-Info.plist

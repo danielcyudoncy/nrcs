@@ -1,105 +1,244 @@
 // features/auth/login_page.dart
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:nrcs/core/auth/auth_service.dart';
-import 'package:nrcs/core/network/api_client.dart';
-import 'package:nrcs/core/auth/token_provider.dart';
-import 'package:nrcs/core/network/http_client.dart';
 
-class LoginPage extends StatefulWidget {
+class LoginPage extends StatelessWidget {
   const LoginPage({super.key});
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
-}
-
-class _LoginPageState extends State<LoginPage> {
-  final _user = TextEditingController();
-  final _pass = TextEditingController();
-  final _loading = false.obs;
-  bool _remember = false;
-  late final AuthService _auth;
-
-  @override
-  void initState() {
-    super.initState();
-    _auth = AuthService(ApiClient());
-  }
-
-  void _doLogin() async {
-    _loading.value = true;
-    final token = await _auth.login(_user.text, _pass.text);
-    TokenProvider.token = token;
-    TokenProvider.username = _user.text;
-    TokenProvider.roles = _user.text == 'approver' ? ['approver'] : [];
-    HttpClient.setToken(token);
-    _loading.value = false;
-    Get.offAllNamed('/');
-  }
-
-  @override
   Widget build(BuildContext context) {
-    final isWide = MediaQuery.of(context).size.width > 800;
-    final leftPanel = Container(
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(colors: [Color(0xFF4A90E2), Color(0xFF0066CC)], begin: Alignment.topCenter, end: Alignment.bottomCenter),
+    return Scaffold(
+      backgroundColor: const Color(0xFF1E2A5C), // Primary background
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          bool isDesktop = constraints.maxWidth > 900;
+          bool isTablet =
+              constraints.maxWidth > 600 && constraints.maxWidth <= 900;
+          bool isMobile = constraints.maxWidth <= 600;
+
+          return Center(
+            child: Container(
+              // OUTER CONTAINER (main card frame)
+              margin: EdgeInsets.all(isMobile ? 16 : 32),
+              padding: EdgeInsets.all(isMobile ? 12 : 20),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(30),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.25),
+                    blurRadius: 20,
+                    offset: const Offset(0, 10),
+                  ),
+                ],
+              ),
+              child: Container(
+                // INNER CONTAINER (glassmorphism for login + logo)
+                padding: EdgeInsets.all(isMobile ? 16 : 24),
+                constraints: const BoxConstraints(maxWidth: 1200),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.08),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: Colors.white.withOpacity(0.2)),
+                ),
+                child: isDesktop || isTablet
+                    ? Row(
+                        children: [
+                          Expanded(child: _buildLoginCard(context)),
+                          const SizedBox(width: 40),
+                          Expanded(child: _buildIllustrationSection()),
+                        ],
+                      )
+                    : Column(
+                        children: [
+                          _buildLoginCard(context),
+                          const SizedBox(height: 24),
+                          _buildIllustrationSection(),
+                        ],
+                      ),
+              ),
+            ),
+          );
+        },
       ),
-      child: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(36.0),
-          child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text('Welcome Page', style: Theme.of(context).textTheme.displaySmall?.copyWith(color: Colors.white, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 8),
-            const Text('Sign in to your account', style: TextStyle(color: Colors.white70)),
-            const SizedBox(height: 24),
-            if (isWide)
-              SizedBox(height: 200, child: Image.network('https://i.imgur.com/3GQ8m2D.png', fit: BoxFit.contain, errorBuilder: (_, __, ___) => const SizedBox.shrink())),
-          ]),
+    );
+  }
+
+  /// LOGIN CARD
+  Widget _buildLoginCard(BuildContext context) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(20),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+        child: Container(
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.15),
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: Colors.white.withOpacity(0.3)),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                "Login",
+                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 24),
+
+              // Email field
+              TextField(
+                decoration: InputDecoration(
+                  labelText: "Email",
+                  labelStyle: const TextStyle(color: Colors.white70),
+                  filled: true,
+                  fillColor: Colors.white.withOpacity(0.1),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+
+              // Password field
+              TextField(
+                obscureText: true,
+                decoration: InputDecoration(
+                  labelText: "Password",
+                  labelStyle: const TextStyle(color: Colors.white70),
+                  filled: true,
+                  fillColor: Colors.white.withOpacity(0.1),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  suffixIcon: const Icon(
+                    Icons.visibility_off,
+                    color: Colors.white70,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 8),
+
+              Align(
+                alignment: Alignment.centerRight,
+                child: TextButton(
+                  onPressed: () {},
+                  child: const Text(
+                    "Forgot Password?",
+                    style: TextStyle(color: Colors.white70),
+                  ),
+                ),
+              ),
+
+              // Sign In Button
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF0D1B4C),
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  onPressed: () {
+                    // TODO: Hook with GetX controller
+                  },
+                  child: const Text("Sign in"),
+                ),
+              ),
+              const SizedBox(height: 16),
+
+              // Divider
+              Row(
+                children: const [
+                  Expanded(child: Divider(color: Colors.white38)),
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 8),
+                    child: Text(
+                      "Or Continue With",
+                      style: TextStyle(color: Colors.white70),
+                    ),
+                  ),
+                  Expanded(child: Divider(color: Colors.white38)),
+                ],
+              ),
+              const SizedBox(height: 16),
+
+              // Social Login Buttons
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  _socialButton(Icons.g_mobiledata, Colors.red, () {}),
+                  const SizedBox(width: 12),
+                  _socialButton(Icons.apple, Colors.black, () {}),
+                  const SizedBox(width: 12),
+                  _socialButton(Icons.facebook, Colors.blue, () {}),
+                ],
+              ),
+              const SizedBox(height: 16),
+
+              // Register link
+              Center(
+                child: RichText(
+                  text: TextSpan(
+                    text: "Don’t have an account yet? ",
+                    style: const TextStyle(color: Colors.white70),
+                    children: [
+                      TextSpan(
+                        text: "Register for free",
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
+  }
 
-    final form = Card(
-      elevation: 6,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: Container(
-        width: isWide ? 420 : double.infinity,
-        padding: const EdgeInsets.all(24),
-        child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-          Text('Hello!', style: Theme.of(context).textTheme.titleLarge),
-          const SizedBox(height: 4),
-          Text('Good Morning', style: Theme.of(context).textTheme.titleMedium?.copyWith(color: Colors.blueAccent)),
-          const SizedBox(height: 12),
-          TextField(controller: _user, decoration: const InputDecoration(labelText: 'Email Address')),
-          const SizedBox(height: 12),
-          TextField(controller: _pass, decoration: const InputDecoration(labelText: 'Password'), obscureText: true),
-          const SizedBox(height: 8),
-          Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-            Row(children: [
-              Checkbox(value: _remember, onChanged: (v) => setState(() => _remember = v ?? false)),
-              const Text('Remember')
-            ]),
-            TextButton(onPressed: () {/* TODO: forgot */}, child: const Text('Forgot Password ?'))
-          ]),
-          const SizedBox(height: 12),
-          Obx(() => ElevatedButton(
-                style: ElevatedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 16), backgroundColor: Colors.blueAccent),
-                onPressed: _loading.value ? null : _doLogin,
-                child: _loading.value ? const CircularProgressIndicator() : const Text('SUBMIT', style: TextStyle(letterSpacing: 1.5)),
-              )),
-          const SizedBox(height: 12),
-          Center(child: TextButton(onPressed: () => Get.toNamed('/create-account'), child: const Text('Create Account')))
-        ]),
+  /// SOCIAL LOGIN BUTTON
+  static Widget _socialButton(IconData icon, Color color, VoidCallback onTap) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(50),
+      child: CircleAvatar(
+        radius: 22,
+        backgroundColor: Colors.white,
+        child: Icon(icon, color: color, size: 28),
       ),
     );
+  }
 
-    return Scaffold(
-      body: SafeArea(
-        child: isWide
-            ? Row(children: [Expanded(child: leftPanel), Expanded(child: Center(child: form))])
-            : SingleChildScrollView(
-                child: Column(children: [leftPanel, const SizedBox(height: 12), Padding(padding: const EdgeInsets.all(12), child: form)]),
-              ),
+  /// ILLUSTRATION SECTION
+  Widget _buildIllustrationSection() {
+    return Container(
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: const [
+          Icon(Icons.bubble_chart, size: 150, color: Colors.white),
+          SizedBox(height: 24),
+          Text(
+            "Built for speed . Realtime . Collaborative",
+            textAlign: TextAlign.center,
+            style: TextStyle(color: Colors.white, fontSize: 16),
+          ),
+        ],
       ),
     );
   }

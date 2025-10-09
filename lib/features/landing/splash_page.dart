@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:nrcs/core/auth/token_provider.dart';
+import '../../core/theme/app_theme.dart';
 
 class SplashPage extends StatefulWidget {
   const SplashPage({super.key});
@@ -28,15 +29,15 @@ class _SplashPageState extends State<SplashPage> {
     return Scaffold(
       body: Container(
         decoration: const BoxDecoration(
-          gradient: LinearGradient(colors: [Color(0xFF0F172A), Color(0xFF0B1220)], begin: Alignment.topLeft, end: Alignment.bottomRight),
+          gradient: LinearGradient(colors: [AppColors.backgroundDark, AppColors.primaryBlue], begin: Alignment.topLeft, end: Alignment.bottomRight),
         ),
         child: Center(
-          child: Column(mainAxisSize: MainAxisSize.min, children: const [
-            Icon(Icons.wifi_tethering, size: 96, color: Colors.white70),
+          child: Column(mainAxisSize: MainAxisSize.min, children: [
+            Icon(Icons.wifi_tethering, size: 96, color: AppColors.textSecondary),
             SizedBox(height: 16),
-            Text('NRCS', style: TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.bold)),
+            Text('NRCS', style: AppTheme.headingMedium.copyWith(color: AppColors.textPrimary)),
             SizedBox(height: 8),
-            Text('News Rundown Control System', style: TextStyle(color: Colors.white70)),
+            Text('News Rundown Control System', style: AppTextTheme.bodyMedium.copyWith(color: AppColors.textSecondary)),
           ]),
         ),
       ),

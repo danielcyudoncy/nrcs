@@ -1,6 +1,8 @@
 // main.dart
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'core/theme/app_theme.dart';
 import 'core/env.dart';
 import 'features/rundown/views/rundown_page.dart';
 import 'features/auth/login_page.dart';
@@ -23,17 +25,24 @@ class NRCSApp extends StatelessWidget {
     // register shared services
     Get.put(StoryService(), permanent: true);
 
-    return GetMaterialApp(
-      title: 'NRCS',
-      theme: ThemeData(primarySwatch: Colors.indigo),
-      initialRoute: '/splash',
-      getPages: [
-        GetPage(name: '/', page: () => const RundownPage()),
-        GetPage(name: '/login', page: () => const LoginPage()),
-        GetPage(name: '/splash', page: () => const SplashPage()),
-        GetPage(name: '/landing', page: () => const LandingPage()),
-        GetPage(name: '/create-account', page: () => const CreateAccountPage()),
-      ],
+    return ScreenUtilInit(
+      designSize: const Size(375, 812), // Standard mobile design size
+      minTextAdapt: true,
+      splitScreenMode: true,
+      builder: (context, child) {
+        return GetMaterialApp(
+          title: 'NRCS',
+          theme: AppTheme.lightTheme,
+          initialRoute: '/splash',
+          getPages: [
+            GetPage(name: '/', page: () => const RundownPage()),
+            GetPage(name: '/login', page: () => const LoginPage()),
+            GetPage(name: '/splash', page: () => const SplashPage()),
+            GetPage(name: '/landing', page: () => const LandingPage()),
+            GetPage(name: '/create-account', page: () => const CreateAccountPage()),
+          ],
+        );
+      },
     );
   }
 }

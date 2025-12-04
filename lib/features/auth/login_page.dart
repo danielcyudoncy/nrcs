@@ -4,8 +4,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../core/theme/app_theme.dart';
 
-class LoginPage extends StatelessWidget {
+class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
+
+  @override
+  State<LoginPage> createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
+  bool _obscureText = true;
 
   @override
   Widget build(BuildContext context) {
@@ -129,7 +136,7 @@ class LoginPage extends StatelessWidget {
 
                   // Password field
                   TextField(
-                    obscureText: true,
+                    obscureText: _obscureText,
                     style: TextStyle(
                       fontSize: isMobile ? 16 : 14,
                       color: AppColors.textPrimary,
@@ -150,9 +157,15 @@ class LoginPage extends StatelessWidget {
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
-                      suffixIcon: const Icon(
-                        Icons.visibility_off,
-                        color: AppColors.textSecondary,
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          _obscureText
+                              ? Icons.visibility_off
+                              : Icons.visibility,
+                          color: AppColors.textSecondary,
+                        ),
+                        onPressed: () =>
+                            setState(() => _obscureText = !_obscureText),
                       ),
                     ),
                   ),

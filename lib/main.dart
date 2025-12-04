@@ -31,6 +31,7 @@ class NRCSApp extends StatelessWidget {
       splitScreenMode: true,
       builder: (context, child) {
         return GetMaterialApp(
+          debugShowCheckedModeBanner: false,
           title: 'NRCS',
           theme: AppTheme.lightTheme,
           initialRoute: '/splash',
@@ -39,7 +40,10 @@ class NRCSApp extends StatelessWidget {
             GetPage(name: '/login', page: () => const LoginPage()),
             GetPage(name: '/splash', page: () => const SplashPage()),
             GetPage(name: '/landing', page: () => const LandingPage()),
-            GetPage(name: '/create-account', page: () => const CreateAccountPage()),
+            GetPage(
+              name: '/create-account',
+              page: () => const CreateAccountPage(),
+            ),
           ],
         );
       },

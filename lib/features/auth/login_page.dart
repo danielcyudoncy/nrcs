@@ -48,17 +48,19 @@ class LoginPage extends StatelessWidget {
                       ? Column(
                           // Mobile: illustration on top, login below
                           children: [
-                            _buildIllustrationSection(),
+                            _buildIllustrationSection(isMobile),
                             const SizedBox(height: 24),
-                            _buildLoginCard(context),
+                            _buildLoginCard(context, isMobile),
                           ],
                         )
                       : Row(
                           // Desktop: side by side
                           children: [
-                            Expanded(child: _buildLoginCard(context)),
+                            Expanded(child: _buildLoginCard(context, isMobile)),
                             const SizedBox(width: 40),
-                            Expanded(child: _buildIllustrationSection()),
+                            Expanded(
+                              child: _buildIllustrationSection(isMobile),
+                            ),
                           ],
                         ),
                 ),
@@ -71,7 +73,7 @@ class LoginPage extends StatelessWidget {
   }
 
   /// LOGIN CARD
-  Widget _buildLoginCard(BuildContext context) {
+  Widget _buildLoginCard(BuildContext context, bool isMobile) {
     return SizedBox(
       height: 500, // Match illustration section height
       child: ClipRRect(
@@ -94,18 +96,30 @@ class LoginPage extends StatelessWidget {
                     style: AppTheme.headingSmall.copyWith(
                       color: AppColors.textPrimary,
                       fontWeight: FontWeight.bold,
+                      fontSize: isMobile ? 20.sp : 6.sp,
                     ),
                   ),
+                  const SizedBox(height: 12),
 
                   // Email field
                   TextField(
+                    style: TextStyle(
+                      fontSize: isMobile ? 16 : 14,
+                      color: AppColors.textPrimary,
+                    ),
                     decoration: InputDecoration(
                       labelText: "Email",
                       labelStyle: AppTextTheme.label.copyWith(
                         color: AppColors.textSecondary,
+                        fontSize: isMobile ? 12.sp : 14,
                       ),
                       filled: true,
                       fillColor: AppColors.glassWhite10,
+                      contentPadding: EdgeInsets.symmetric(
+                        vertical: isMobile ? 16 : 14,
+                        horizontal: 12,
+                      ),
+                      isDense: !isMobile,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
@@ -116,13 +130,23 @@ class LoginPage extends StatelessWidget {
                   // Password field
                   TextField(
                     obscureText: true,
+                    style: TextStyle(
+                      fontSize: isMobile ? 16 : 14,
+                      color: AppColors.textPrimary,
+                    ),
                     decoration: InputDecoration(
                       labelText: "Password",
                       labelStyle: AppTextTheme.label.copyWith(
                         color: AppColors.textSecondary,
+                        fontSize: isMobile ? 12.sp : 14,
                       ),
                       filled: true,
                       fillColor: AppColors.glassWhite10,
+                      contentPadding: EdgeInsets.symmetric(
+                        vertical: isMobile ? 16 : 14,
+                        horizontal: 12,
+                      ),
+                      isDense: !isMobile,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
@@ -142,6 +166,7 @@ class LoginPage extends StatelessWidget {
                         "Forgot Password?",
                         style: AppTextTheme.bodySmall.copyWith(
                           color: AppColors.textSecondary,
+                          fontSize: isMobile ? 12.sp : 14,
                         ),
                       ),
                     ),
@@ -165,6 +190,7 @@ class LoginPage extends StatelessWidget {
                         "Sign in",
                         style: AppTextTheme.button.copyWith(
                           color: AppColors.textPrimary,
+                          fontSize: isMobile ? 16.sp : 14,
                         ),
                       ),
                     ),
@@ -181,6 +207,7 @@ class LoginPage extends StatelessWidget {
                           "Or Continue With",
                           style: AppTextTheme.bodySmall.copyWith(
                             color: AppColors.textSecondary,
+                            fontSize: isMobile ? 12.sp : 14,
                           ),
                         ),
                       ),
@@ -209,6 +236,7 @@ class LoginPage extends StatelessWidget {
                         text: "Don’t have an account yet? ",
                         style: AppTextTheme.bodySmall.copyWith(
                           color: AppColors.textSecondary,
+                          fontSize: isMobile ? 12.sp : 14,
                         ),
                         children: [
                           TextSpan(
@@ -216,6 +244,7 @@ class LoginPage extends StatelessWidget {
                             style: AppTextTheme.bodySmall.copyWith(
                               color: AppColors.textPrimary,
                               fontWeight: FontWeight.bold,
+                              fontSize: isMobile ? 12.sp : 14,
                             ),
                           ),
                         ],
@@ -245,7 +274,7 @@ class LoginPage extends StatelessWidget {
   }
 
   /// ILLUSTRATION SECTION
-  Widget _buildIllustrationSection() {
+  Widget _buildIllustrationSection(bool isMobile) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -267,7 +296,10 @@ class LoginPage extends StatelessWidget {
         Text(
           "Built for speed . Realtime . Collaborative",
           textAlign: TextAlign.center,
-          style: AppTextTheme.bodyMedium.copyWith(color: AppColors.textPrimary),
+          style: AppTextTheme.bodyMedium.copyWith(
+            color: AppColors.textPrimary,
+            fontSize: isMobile ? 14.sp : 14,
+          ),
         ),
       ],
     );

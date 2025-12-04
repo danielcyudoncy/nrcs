@@ -1,8 +1,12 @@
 // features/auth/login_page.dart
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import '../../core/theme/app_theme.dart';
+import '../../core/validations.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -12,7 +16,21 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  final _formKey = GlobalKey<FormState>();
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
   bool _obscureText = true;
+  bool _isLoading = false;
+
+  void _login() async {
+    if (_formKey.currentState!.validate()) {
+      setState(() => _isLoading = true);
+      // Simulate login
+      await Future.delayed(const Duration(seconds: 2));
+      setState(() => _isLoading = false);
+      Get.offNamed('/rundown');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -95,176 +113,195 @@ class _LoginPageState extends State<LoginPage> {
               border: Border.all(color: AppColors.glassWhite30),
             ),
             child: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "Login",
-                    style: AppTheme.headingSmall.copyWith(
-                      color: AppColors.textPrimary,
-                      fontWeight: FontWeight.bold,
-                      fontSize: isMobile ? 20.sp : 6.sp,
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Login",
+                      style: AppTheme.headingSmall.copyWith(
+                        color: AppColors.textPrimary,
+                        fontWeight: FontWeight.bold,
+                        fontSize: isMobile ? 20.sp : 6.sp,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 12),
+                    const SizedBox(height: 12),
 
-                  // Email field
-                  TextField(
-                    style: TextStyle(
-                      fontSize: isMobile ? 16 : 14,
-                      color: AppColors.textPrimary,
-                    ),
-                    decoration: InputDecoration(
-                      labelText: "Email",
-                      labelStyle: AppTextTheme.label.copyWith(
-                        color: AppColors.textSecondary,
-                        fontSize: isMobile ? 12.sp : 14,
+                    // Email field
+                    TextFormField(
+                      controller: _emailController,
+                      validator: Validators.validateEmail,
+                      style: TextStyle(
+                        fontSize: isMobile ? 16 : 14,
+                        color: AppColors.textPrimary,
                       ),
-                      filled: true,
-                      fillColor: AppColors.glassWhite10,
-                      contentPadding: EdgeInsets.symmetric(
-                        vertical: isMobile ? 16 : 14,
-                        horizontal: 12,
-                      ),
-                      isDense: !isMobile,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-
-                  // Password field
-                  TextField(
-                    obscureText: _obscureText,
-                    style: TextStyle(
-                      fontSize: isMobile ? 16 : 14,
-                      color: AppColors.textPrimary,
-                    ),
-                    decoration: InputDecoration(
-                      labelText: "Password",
-                      labelStyle: AppTextTheme.label.copyWith(
-                        color: AppColors.textSecondary,
-                        fontSize: isMobile ? 12.sp : 14,
-                      ),
-                      filled: true,
-                      fillColor: AppColors.glassWhite10,
-                      contentPadding: EdgeInsets.symmetric(
-                        vertical: isMobile ? 16 : 14,
-                        horizontal: 12,
-                      ),
-                      isDense: !isMobile,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      suffixIcon: IconButton(
-                        icon: Icon(
-                          _obscureText
-                              ? Icons.visibility_off
-                              : Icons.visibility,
-                          color: AppColors.textSecondary,
-                        ),
-                        onPressed: () =>
-                            setState(() => _obscureText = !_obscureText),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: TextButton(
-                      onPressed: () {},
-                      child: Text(
-                        "Forgot Password?",
-                        style: AppTextTheme.bodySmall.copyWith(
+                      decoration: InputDecoration(
+                        labelText: "Email",
+                        labelStyle: AppTextTheme.label.copyWith(
                           color: AppColors.textSecondary,
                           fontSize: isMobile ? 12.sp : 14,
                         ),
-                      ),
-                    ),
-                  ),
-
-                  // Sign In Button
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.buttonPrimary,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
+                        filled: true,
+                        fillColor: AppColors.glassWhite10,
+                        contentPadding: EdgeInsets.symmetric(
+                          vertical: isMobile ? 16 : 14,
+                          horizontal: 12,
                         ),
-                      ),
-                      onPressed: () {
-                        // TODO: Hook with GetX controller
-                      },
-                      child: Text(
-                        "Sign in",
-                        style: AppTextTheme.button.copyWith(
-                          color: AppColors.textPrimary,
-                          fontSize: isMobile ? 16.sp : 14,
+                        isDense: !isMobile,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        errorStyle: TextStyle(
+                          fontSize: isMobile ? 10 : 12,
+                          color: Colors.red,
                         ),
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 16),
+                    const SizedBox(height: 16),
 
-                  // Divider
-                  Row(
-                    children: [
-                      Expanded(child: Divider(color: AppColors.glassWhite30)),
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 8.w),
+                    // Password field
+                    TextFormField(
+                      controller: _passwordController,
+                      validator: Validators.validatePassword,
+                      obscureText: _obscureText,
+                      style: TextStyle(
+                        fontSize: isMobile ? 16 : 14,
+                        color: AppColors.textPrimary,
+                      ),
+                      decoration: InputDecoration(
+                        labelText: "Password",
+                        labelStyle: AppTextTheme.label.copyWith(
+                          color: AppColors.textSecondary,
+                          fontSize: isMobile ? 12.sp : 14,
+                        ),
+                        filled: true,
+                        fillColor: AppColors.glassWhite10,
+                        contentPadding: EdgeInsets.symmetric(
+                          vertical: isMobile ? 16 : 14,
+                          horizontal: 12,
+                        ),
+                        isDense: !isMobile,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            _obscureText
+                                ? Icons.visibility_off
+                                : Icons.visibility,
+                            color: AppColors.textSecondary,
+                          ),
+                          onPressed: () =>
+                              setState(() => _obscureText = !_obscureText),
+                        ),
+                        errorStyle: TextStyle(
+                          fontSize: isMobile ? 10 : 12,
+                          color: Colors.red,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: TextButton(
+                        onPressed: () {},
                         child: Text(
-                          "Or Continue With",
+                          "Forgot Password?",
                           style: AppTextTheme.bodySmall.copyWith(
                             color: AppColors.textSecondary,
                             fontSize: isMobile ? 12.sp : 14,
                           ),
                         ),
                       ),
-                      Expanded(child: Divider(color: AppColors.glassWhite30)),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
+                    ),
 
-                  // Social Login Buttons
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      _socialButton(Icons.g_mobiledata, Colors.red, () {}),
-                      const SizedBox(width: 12),
-                      _socialButton(Icons.apple, Colors.black, () {}),
-                      const SizedBox(width: 12),
-                      _socialButton(Icons.facebook, Colors.blue, () {}),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-
-                  // Register link
-                  Center(
-                    child: RichText(
-                      text: TextSpan(
-                        text: "Don’t have an account yet? ",
-                        style: AppTextTheme.bodySmall.copyWith(
-                          color: AppColors.textSecondary,
-                          fontSize: isMobile ? 12.sp : 14,
+                    // Sign In Button
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.buttonPrimary,
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
                         ),
-                        children: [
-                          TextSpan(
-                            text: "Register for free",
+                        onPressed: _isLoading ? null : _login,
+                        child: _isLoading
+                            ? const CircularProgressIndicator(
+                                color: Colors.white,
+                              )
+                            : Text(
+                                "Sign in",
+                                style: AppTextTheme.button.copyWith(
+                                  color: AppColors.textPrimary,
+                                  fontSize: isMobile ? 16.sp : 14,
+                                ),
+                              ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Divider
+                    Row(
+                      children: [
+                        Expanded(child: Divider(color: AppColors.glassWhite30)),
+                        Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 8.w),
+                          child: Text(
+                            "Or Continue With",
                             style: AppTextTheme.bodySmall.copyWith(
-                              color: AppColors.textPrimary,
-                              fontWeight: FontWeight.bold,
+                              color: AppColors.textSecondary,
                               fontSize: isMobile ? 12.sp : 14,
                             ),
                           ),
-                        ],
+                        ),
+                        Expanded(child: Divider(color: AppColors.glassWhite30)),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Social Login Buttons
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        _socialButton(Icons.g_mobiledata, Colors.red, () {}),
+                        const SizedBox(width: 12),
+                        _socialButton(Icons.apple, Colors.black, () {}),
+                        const SizedBox(width: 12),
+                        _socialButton(Icons.facebook, Colors.blue, () {}),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Register link
+                    Center(
+                      child: RichText(
+                        text: TextSpan(
+                          text: "Don’t have an account yet? ",
+                          style: AppTextTheme.bodySmall.copyWith(
+                            color: AppColors.textSecondary,
+                            fontSize: isMobile ? 12.sp : 14,
+                          ),
+                          children: [
+                            TextSpan(
+                              text: "Register for free",
+                              style: AppTextTheme.bodySmall.copyWith(
+                                color: AppColors.textPrimary,
+                                fontWeight: FontWeight.bold,
+                                fontSize: isMobile ? 12.sp : 14,
+                              ),
+                              recognizer: TapGestureRecognizer()
+                                ..onTap = () => Get.toNamed('/create-account'),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),

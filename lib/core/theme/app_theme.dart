@@ -24,12 +24,12 @@ class AppColors {
   static const Color glassBlue = Color(0xFF1E2A5C);
 
   // Opacity variants for glassmorphism effects
-  static Color glassWhite10 = Colors.white.withOpacity(0.1);
-  static Color glassWhite08 = Colors.white.withOpacity(0.08);
-  static Color glassWhite15 = Colors.white.withOpacity(0.15);
-  static Color glassWhite20 = Colors.white.withOpacity(0.2);
-  static Color glassWhite30 = Colors.white.withOpacity(0.3);
-  static Color glassWhite70 = Colors.white.withOpacity(0.7);
+  static Color glassWhite10 = Colors.white.withValues(alpha: 0.1);
+  static Color glassWhite08 = Colors.white.withValues(alpha: 0.08);
+  static Color glassWhite15 = Colors.white.withValues(alpha: 0.15);
+  static Color glassWhite20 = Colors.white.withValues(alpha: 0.2);
+  static Color glassWhite30 = Colors.white.withValues(alpha: 0.3);
+  static Color glassWhite70 = Colors.white.withValues(alpha: 0.7);
 
   // Button Colors
   static const Color buttonPrimary = primaryBlue;
@@ -103,21 +103,18 @@ class AppTextTheme {
 /// Channels App Theme Data
 class AppTheme {
   static ThemeData get lightTheme => ThemeData(
-    primarySwatch: MaterialColor(
-      AppColors.primaryBlue.value,
-      <int, Color>{
-        50: AppColors.primaryBlue.withValues(alpha: 0.1),
-        100: AppColors.primaryBlue.withValues(alpha: 0.2),
-        200: AppColors.primaryBlue.withOpacity(0.3),
-        300: AppColors.primaryBlue.withOpacity(0.4),
-        400: AppColors.primaryBlue.withOpacity(0.5),
-        500: AppColors.primaryBlue.withOpacity(0.6),
-        600: AppColors.primaryBlue.withOpacity(0.7),
-        700: AppColors.primaryBlue.withOpacity(0.8),
-        800: AppColors.primaryBlue.withOpacity(0.9),
-        900: AppColors.primaryBlue,
-      },
-    ),
+    primarySwatch: MaterialColor(AppColors.primaryBlue.toARGB32(), <int, Color>{
+      50: AppColors.primaryBlue.withValues(alpha: 0.1),
+      100: AppColors.primaryBlue.withValues(alpha: 0.2),
+      200: AppColors.primaryBlue.withValues(alpha: 0.3),
+      300: AppColors.primaryBlue.withValues(alpha: 0.4),
+      400: AppColors.primaryBlue.withValues(alpha: 0.5),
+      500: AppColors.primaryBlue.withValues(alpha: 0.6),
+      600: AppColors.primaryBlue.withValues(alpha: 0.7),
+      700: AppColors.primaryBlue.withValues(alpha: 0.8),
+      800: AppColors.primaryBlue.withValues(alpha: 0.9),
+      900: AppColors.primaryBlue,
+    }),
     scaffoldBackgroundColor: AppColors.backgroundDark,
     textTheme: TextTheme(
       displayLarge: headingLarge,
@@ -163,9 +160,7 @@ class AppTheme {
     ),
     cardTheme: CardThemeData(
       color: AppColors.backgroundCard,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(15.r),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15.r)),
       elevation: 0,
     ),
   );

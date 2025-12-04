@@ -25,7 +25,7 @@ class LoginPage extends StatelessWidget {
                 borderRadius: BorderRadius.circular(30),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.25),
+                    color: Colors.black.withValues(alpha: 0.25),
                     blurRadius: 20,
                     offset: const Offset(0, 10),
                   ),
@@ -45,14 +45,16 @@ class LoginPage extends StatelessWidget {
                 ),
                 child: SingleChildScrollView(
                   child: isMobile
-                      ? Column( // Mobile: illustration on top, login below
+                      ? Column(
+                          // Mobile: illustration on top, login below
                           children: [
                             _buildIllustrationSection(),
                             const SizedBox(height: 24),
                             _buildLoginCard(context),
                           ],
                         )
-                      : Row( // Desktop: side by side
+                      : Row(
+                          // Desktop: side by side
                           children: [
                             Expanded(child: _buildLoginCard(context)),
                             const SizedBox(width: 40),
@@ -68,152 +70,166 @@ class LoginPage extends StatelessWidget {
     );
   }
 
- /// LOGIN CARD
- Widget _buildLoginCard(BuildContext context) {
-   return Container(
-     height: 500, // Match illustration section height
-     child: ClipRRect(
-       borderRadius: BorderRadius.circular(20),
-       child: BackdropFilter(
-         filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
-         child: Container(
-           padding: const EdgeInsets.all(24),
-           decoration: BoxDecoration(
-             color: AppColors.glassWhite15,
-             borderRadius: BorderRadius.circular(20),
-             border: Border.all(color: AppColors.glassWhite30),
-           ),
-           child: SingleChildScrollView(
-             child: Column(
-               crossAxisAlignment: CrossAxisAlignment.start,
-               children: [
-                 Text(
-                   "Login",
-                   style: AppTheme.headingSmall.copyWith(
-                     color: AppColors.textPrimary,
-                     fontWeight: FontWeight.bold,
-                   ),
-                 ),
-                 
+  /// LOGIN CARD
+  Widget _buildLoginCard(BuildContext context) {
+    return SizedBox(
+      height: 500, // Match illustration section height
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(20),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+          child: Container(
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: AppColors.glassWhite15,
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: AppColors.glassWhite30),
+            ),
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "Login",
+                    style: AppTheme.headingSmall.copyWith(
+                      color: AppColors.textPrimary,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
 
-                 // Email field
-                 TextField(
-                   decoration: InputDecoration(
-                     labelText: "Email",
-                     labelStyle: AppTextTheme.label.copyWith(color: AppColors.textSecondary),
-                     filled: true,
-                     fillColor: AppColors.glassWhite10,
-                     border: OutlineInputBorder(
-                       borderRadius: BorderRadius.circular(8),
-                     ),
-                   ),
-                 ),
-                 const SizedBox(height: 16),
+                  // Email field
+                  TextField(
+                    decoration: InputDecoration(
+                      labelText: "Email",
+                      labelStyle: AppTextTheme.label.copyWith(
+                        color: AppColors.textSecondary,
+                      ),
+                      filled: true,
+                      fillColor: AppColors.glassWhite10,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
 
-                 // Password field
-                 TextField(
-                   obscureText: true,
-                   decoration: InputDecoration(
-                     labelText: "Password",
-                     labelStyle: AppTextTheme.label.copyWith(color: AppColors.textSecondary),
-                     filled: true,
-                     fillColor: AppColors.glassWhite10,
-                     border: OutlineInputBorder(
-                       borderRadius: BorderRadius.circular(8),
-                     ),
-                     suffixIcon: const Icon(
-                       Icons.visibility_off,
-                       color: AppColors.textSecondary,
-                     ),
-                   ),
-                 ),
-                 const SizedBox(height: 8),
+                  // Password field
+                  TextField(
+                    obscureText: true,
+                    decoration: InputDecoration(
+                      labelText: "Password",
+                      labelStyle: AppTextTheme.label.copyWith(
+                        color: AppColors.textSecondary,
+                      ),
+                      filled: true,
+                      fillColor: AppColors.glassWhite10,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      suffixIcon: const Icon(
+                        Icons.visibility_off,
+                        color: AppColors.textSecondary,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
 
-                 Align(
-                   alignment: Alignment.centerRight,
-                   child: TextButton(
-                     onPressed: () {},
-                     child: Text(
-                       "Forgot Password?",
-                       style: AppTextTheme.bodySmall.copyWith(color: AppColors.textSecondary),
-                     ),
-                   ),
-                 ),
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: TextButton(
+                      onPressed: () {},
+                      child: Text(
+                        "Forgot Password?",
+                        style: AppTextTheme.bodySmall.copyWith(
+                          color: AppColors.textSecondary,
+                        ),
+                      ),
+                    ),
+                  ),
 
-                 // Sign In Button
-                 SizedBox(
-                   width: double.infinity,
-                   child: ElevatedButton(
-                     style: ElevatedButton.styleFrom(
-                       backgroundColor: AppColors.buttonPrimary,
-                       padding: const EdgeInsets.symmetric(vertical: 16),
-                       shape: RoundedRectangleBorder(
-                         borderRadius: BorderRadius.circular(10),
-                       ),
-                     ),
-                     onPressed: () {
-                       // TODO: Hook with GetX controller
-                     },
-                     child: Text("Sign in", style: AppTextTheme.button.copyWith(color: AppColors.textPrimary),),
-                   ),
-                 ),
-                 const SizedBox(height: 16),
+                  // Sign In Button
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.buttonPrimary,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      onPressed: () {
+                        // TODO: Hook with GetX controller
+                      },
+                      child: Text(
+                        "Sign in",
+                        style: AppTextTheme.button.copyWith(
+                          color: AppColors.textPrimary,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
 
-                 // Divider
-                 Row(
-                   children: [
-                     Expanded(child: Divider(color: AppColors.glassWhite30)),
-                     Padding(
-                       padding: EdgeInsets.symmetric(horizontal: 8.w),
-                       child: Text(
-                         "Or Continue With",
-                         style: AppTextTheme.bodySmall.copyWith(color: AppColors.textSecondary),
-                       ),
-                     ),
-                     Expanded(child: Divider(color: AppColors.glassWhite30)),
-                   ],
-                 ),
-                 const SizedBox(height: 16),
+                  // Divider
+                  Row(
+                    children: [
+                      Expanded(child: Divider(color: AppColors.glassWhite30)),
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 8.w),
+                        child: Text(
+                          "Or Continue With",
+                          style: AppTextTheme.bodySmall.copyWith(
+                            color: AppColors.textSecondary,
+                          ),
+                        ),
+                      ),
+                      Expanded(child: Divider(color: AppColors.glassWhite30)),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
 
-                 // Social Login Buttons
-                 Row(
-                   mainAxisAlignment: MainAxisAlignment.center,
-                   children: [
-                     _socialButton(Icons.g_mobiledata, Colors.red, () {}),
-                     const SizedBox(width: 12),
-                     _socialButton(Icons.apple, Colors.black, () {}),
-                     const SizedBox(width: 12),
-                     _socialButton(Icons.facebook, Colors.blue, () {}),
-                   ],
-                 ),
-                 const SizedBox(height: 16),
+                  // Social Login Buttons
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      _socialButton(Icons.g_mobiledata, Colors.red, () {}),
+                      const SizedBox(width: 12),
+                      _socialButton(Icons.apple, Colors.black, () {}),
+                      const SizedBox(width: 12),
+                      _socialButton(Icons.facebook, Colors.blue, () {}),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
 
-                 // Register link
-                 Center(
-                   child: RichText(
-                     text: TextSpan(
-                       text: "Don’t have an account yet? ",
-                       style: AppTextTheme.bodySmall.copyWith(color: AppColors.textSecondary),
-                       children: [
-                         TextSpan(
-                           text: "Register for free",
-                           style: AppTextTheme.bodySmall.copyWith(
-                             color: AppColors.textPrimary,
-                             fontWeight: FontWeight.bold,
-                           ),
-                         ),
-                       ],
-                     ),
-                   ),
-                 ),
-               ],
-             ),
-           ),
-         ),
-       ),
-     ),
-   );
- }
+                  // Register link
+                  Center(
+                    child: RichText(
+                      text: TextSpan(
+                        text: "Don’t have an account yet? ",
+                        style: AppTextTheme.bodySmall.copyWith(
+                          color: AppColors.textSecondary,
+                        ),
+                        children: [
+                          TextSpan(
+                            text: "Register for free",
+                            style: AppTextTheme.bodySmall.copyWith(
+                              color: AppColors.textPrimary,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 
   /// SOCIAL LOGIN BUTTON
   static Widget _socialButton(IconData icon, Color color, VoidCallback onTap) {
@@ -236,9 +252,7 @@ class LoginPage extends StatelessWidget {
         Container(
           width: 350,
           height: 350,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(15),
-          ),
+          decoration: BoxDecoration(borderRadius: BorderRadius.circular(15)),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(15),
             child: Image.asset(

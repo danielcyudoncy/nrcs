@@ -22,6 +22,7 @@ class LandingPage extends StatelessWidget {
             final buttonFontSize = isMobile
                 ? screenWidth * 0.035
                 : screenWidth * 0.02; // Smaller on mobile
+            final buttonHeight = isMobile ? 50.0 : 80.0;
             final cardWidth = isMobile ? screenWidth * 0.8 : 420.0;
             final cardHeight = isMobile
                 ? screenHeight * 0.3
@@ -112,6 +113,12 @@ class LandingPage extends StatelessWidget {
                                 children: [
                                   Expanded(
                                     child: ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
+                                        minimumSize: Size(
+                                          double.infinity,
+                                          buttonHeight,
+                                        ),
+                                      ),
                                       onPressed: () => Get.toNamed('/login'),
                                       child: FittedBox(
                                         fit: BoxFit.scaleDown,
@@ -128,12 +135,18 @@ class LandingPage extends StatelessWidget {
                                   SizedBox(width: screenWidth * 0.03),
                                   Expanded(
                                     child: ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
+                                        minimumSize: Size(
+                                          double.infinity,
+                                          buttonHeight,
+                                        ),
+                                      ),
                                       onPressed: () =>
                                           Get.toNamed('/create-account'),
                                       child: FittedBox(
                                         fit: BoxFit.scaleDown,
                                         child: Text(
-                                          'Create account',
+                                          'Sign up',
                                           style: TextStyle(
                                             fontWeight: FontWeight.bold,
                                             fontSize: buttonFontSize,
@@ -177,6 +190,12 @@ class LandingPage extends StatelessWidget {
                                       children: [
                                         Expanded(
                                           child: ElevatedButton(
+                                            style: ElevatedButton.styleFrom(
+                                              minimumSize: Size(
+                                                double.infinity,
+                                                buttonHeight,
+                                              ),
+                                            ),
                                             onPressed: () =>
                                                 Get.toNamed('/login'),
                                             child: FittedBox(
@@ -194,12 +213,18 @@ class LandingPage extends StatelessWidget {
                                         SizedBox(width: screenWidth * 0.03),
                                         Expanded(
                                           child: ElevatedButton(
+                                            style: ElevatedButton.styleFrom(
+                                              minimumSize: Size(
+                                                double.infinity,
+                                                buttonHeight,
+                                              ),
+                                            ),
                                             onPressed: () =>
                                                 Get.toNamed('/create-account'),
                                             child: FittedBox(
                                               fit: BoxFit.scaleDown,
                                               child: Text(
-                                                'Create account',
+                                                'Sign up',
                                                 style: TextStyle(
                                                   fontWeight: FontWeight.bold,
                                                   fontSize: buttonFontSize,
@@ -243,7 +268,7 @@ class LandingPage extends StatelessWidget {
                                               'Rundown editor, real-time updates and granular permissions.',
                                               textAlign: TextAlign.center,
                                               style: TextStyle(
-                                                fontSize: descFontSize,
+                                                fontSize: titleFontSize,
                                               ),
                                             ),
                                           ),

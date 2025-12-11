@@ -6,7 +6,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 /// Based on the Channels branding with blue and red color scheme
 class AppColors {
   // Primary Brand Colors
-  static const Color primaryBlue = Color(0xFF1E2A5C);
+  static const Color primaryBlue = Color(0xFF022d62);
   static const Color accentRed = Color(0xFFE53E3E);
   static const Color orangeAccent = Color(0xFFFF6B35);
 
@@ -21,7 +21,7 @@ class AppColors {
 
   // Glassmorphism Colors
   static const Color glassWhite = Colors.white;
-  static const Color glassBlue = Color(0xFF1E2A5C);
+  static const Color glassBlue = Color(0xFF253ebc);
 
   // Opacity variants for glassmorphism effects
   static Color glassWhite10 = Colors.white.withValues(alpha: 0.1);
@@ -38,7 +38,7 @@ class AppColors {
   // Status Colors
   static const Color success = Color(0xFF48BB78);
   static const Color warning = Color(0xFFFFC107);
-  static const Color error = Color(0xFFE53E3E);
+  static const Color error = Color(0xFFb61f24);
 }
 
 /// Channels App Text Theme

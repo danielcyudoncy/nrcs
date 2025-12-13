@@ -27,7 +27,7 @@ class NRCSApp extends StatelessWidget {
 
     return ScreenUtilInit(
       designSize: const Size(375, 812), // Standard mobile design size
-      minTextAdapt: true,
+      minTextAdapt: false,
       splitScreenMode: true,
       builder: (context, child) {
         return GetMaterialApp(

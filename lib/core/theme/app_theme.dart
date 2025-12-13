@@ -18,6 +18,7 @@ class AppColors {
   static const Color textPrimary = Colors.white;
   static const Color textSecondary = Colors.white70;
   static const Color textAccent = Color(0xFFFF6B35);
+  static const Color textOriginal = Color(0xFF022d62);
 
   // Glassmorphism Colors
   static const Color glassWhite = Colors.white;

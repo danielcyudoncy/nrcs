@@ -286,9 +286,9 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                           children: [
                             TextSpan(
-                              text: "Register for free",
+                              text: " Register for free",
                               style: AppTextTheme.bodySmall.copyWith(
-                                color: AppColors.textPrimary,
+                                color: AppColors.textOriginal,
                                 fontWeight: FontWeight.bold,
                                 fontSize: isMobile ? 12.sp : 14,
                               ),

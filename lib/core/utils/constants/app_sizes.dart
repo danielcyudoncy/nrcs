@@ -1,3 +1,4 @@
+// core/utils/constants/app_sizes.dart
 class AppSizes {
   // Spacing
   static const double xs = 4.0;
@@ -29,6 +30,7 @@ class AppSizes {
   static const double borderRadiusSm = 4.0;
   static const double borderRadiusMd = 8.0;
   static const double borderRadiusLg = 12.0;
+  static const double borderRadiusXl = 15.0;
 
   // Spacing between sections
   static const double spaceBtwSections = 24.0;

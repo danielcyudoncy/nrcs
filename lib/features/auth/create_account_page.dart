@@ -352,9 +352,9 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                           ),
                           children: [
                             TextSpan(
-                              text: "Sign In",
+                              text: "  Sign In",
                               style: AppTextTheme.bodySmall.copyWith(
-                                color: AppColors.textPrimary,
+                                color: AppColors.textOriginal,
                                 fontWeight: FontWeight.bold,
                                 fontSize: isMobile ? 12.sp : 14,
                               ),

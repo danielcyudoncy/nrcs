@@ -5,7 +5,6 @@ import 'package:nrcs/core/services/story_service.dart';
 import 'package:nrcs/core/models/story.dart';
 import 'package:nrcs/core/theme/app_theme.dart';
 import 'package:nrcs/core/utils/responsive_utils.dart';
-import '../controllers/rundown_controller.dart';
 import 'package:nrcs/features/scripts/views/script_editor_page.dart';
 
 class RundownPage extends StatelessWidget {
@@ -14,8 +13,6 @@ class RundownPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final svc = Get.put(StoryService());
-    final controller = Get.put(RundownController());
-    controller.loadSample();
 
     return Scaffold(
       backgroundColor: AppColors.backgroundDark,
@@ -84,7 +81,10 @@ class RundownPage extends StatelessWidget {
                 case 'settings':
                   break;
                 case 'refresh':
-                  controller.loadSample();
+                  svc.refresh();
+                  break;
+                case 'loadDemo':
+                  svc.loadDemoData();
                   break;
               }
             },
@@ -101,6 +101,13 @@ class RundownPage extends StatelessWidget {
                 child: ListTile(
                   leading: const Icon(Icons.refresh),
                   title: Text('Refresh', style: AppTheme.bodyMedium),
+                ),
+              ),
+              PopupMenuItem(
+                value: 'loadDemo',
+                child: ListTile(
+                  leading: const Icon(Icons.play_circle),
+                  title: Text('Load Demo Data', style: AppTheme.bodyMedium),
                 ),
               ),
             ],
@@ -154,23 +161,25 @@ class RundownPage extends StatelessWidget {
                   Expanded(
                     child: Container(
                       margin: const EdgeInsets.symmetric(horizontal: 12),
-                      child: ReorderableListView.builder(
-                        itemCount: stories.length,
-                        onReorder: (oldIndex, newIndex) {
-                          if (newIndex > oldIndex) newIndex -= 1;
-                          svc.reorder(oldIndex, newIndex);
-                        },
-                        itemBuilder: (context, i) {
-                          final s = stories[i];
-                          return _buildStoryCard(
-                            key: ValueKey(s.id),
-                            story: s,
-                            index: i,
-                            onTap: () =>
-                                Get.to(() => ScriptEditorPage(story: s)),
-                          );
-                        },
-                      ),
+                      child: stories.isEmpty
+                          ? _buildEmptyState()
+                          : ReorderableListView.builder(
+                              itemCount: stories.length,
+                              onReorder: (oldIndex, newIndex) {
+                                if (newIndex > oldIndex) newIndex -= 1;
+                                svc.reorder(oldIndex, newIndex);
+                              },
+                              itemBuilder: (context, i) {
+                                final s = stories[i];
+                                return _buildStoryCard(
+                                  key: ValueKey(s.id),
+                                  story: s,
+                                  index: i,
+                                  onTap: () =>
+                                      Get.to(() => ScriptEditorPage(story: s)),
+                                );
+                              },
+                            ),
                     ),
                   ),
                 ],
@@ -178,6 +187,48 @@ class RundownPage extends StatelessWidget {
             },
           );
         },
+      ),
+    );
+  }
+
+  Widget _buildEmptyState() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.article_outlined,
+            size: 64,
+            color: AppColors.textSecondary,
+          ),
+          const SizedBox(height: 16),
+          Text(
+            'No stories yet',
+            style: AppTheme.headingSmall?.copyWith(
+              color: AppColors.textSecondary,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Add your first story or load demo data',
+            style: AppTheme.bodyMedium?.copyWith(
+              color: AppColors.textSecondary,
+            ),
+          ),
+          const SizedBox(height: 24),
+          ElevatedButton.icon(
+            onPressed: () {
+              final svc = Get.find<StoryService>();
+              svc.loadDemoData();
+            },
+            icon: const Icon(Icons.play_circle),
+            label: const Text('Load Demo Data'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.buttonPrimary,
+              foregroundColor: AppColors.textPrimary,
+            ),
+          ),
+        ],
       ),
     );
   }

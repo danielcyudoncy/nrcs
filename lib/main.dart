@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'core/theme/app_theme.dart';
 import 'core/env.dart';
+import 'core/utils/responsive_utils.dart';
 import 'features/rundown/views/rundown_page.dart';
 import 'features/auth/login_page.dart';
 import 'features/landing/splash_page.dart';
@@ -24,6 +25,7 @@ class NRCSApp extends StatelessWidget {
   Widget build(BuildContext context) {
     // register shared services
     Get.put(StoryService(), permanent: true);
+    Get.put(ResponsiveController(), permanent: true);
 
     return ScreenUtilInit(
       designSize: const Size(375, 812), // Standard mobile design size

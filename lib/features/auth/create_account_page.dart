@@ -2,7 +2,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:nrcs/core/network/api_client.dart';
 import '../../core/theme/app_theme.dart';
@@ -66,7 +65,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                 borderRadius: BorderRadius.circular(30),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.25),
+                    color: Colors.black.withAlpha((0.25 * 255).round()),
                     blurRadius: 20,
                     offset: const Offset(0, 10),
                   ),
@@ -135,30 +134,17 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      "Create Account",
-                      style: AppTheme.headingSmall.copyWith(
-                        color: AppColors.textPrimary,
-                        fontWeight: FontWeight.bold,
-                        fontSize: isMobile ? 20.sp : 14,
-                      ),
-                    ),
+                    Text("Create Account", style: AppTheme.headingSmall),
                     const SizedBox(height: 12),
 
                     // Name field
                     TextFormField(
                       controller: _name,
                       validator: Validators.validateName,
-                      style: TextStyle(
-                        fontSize: isMobile ? 16 : 14,
-                        color: AppColors.textPrimary,
-                      ),
+                      style: AppTheme.bodyLarge,
                       decoration: InputDecoration(
                         labelText: "Full Name",
-                        labelStyle: AppTextTheme.label.copyWith(
-                          color: AppColors.textSecondary,
-                          fontSize: isMobile ? 12.sp : 14,
-                        ),
+                        labelStyle: AppTheme.label,
                         filled: true,
                         fillColor: AppColors.glassWhite10,
                         contentPadding: EdgeInsets.symmetric(
@@ -177,16 +163,10 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                     TextFormField(
                       controller: _user,
                       validator: Validators.validateEmail,
-                      style: TextStyle(
-                        fontSize: isMobile ? 16 : 14,
-                        color: AppColors.textPrimary,
-                      ),
+                      style: AppTheme.bodyLarge,
                       decoration: InputDecoration(
                         labelText: "Email Address",
-                        labelStyle: AppTextTheme.label.copyWith(
-                          color: AppColors.textSecondary,
-                          fontSize: isMobile ? 12.sp : 14,
-                        ),
+                        labelStyle: AppTheme.label,
                         filled: true,
                         fillColor: AppColors.glassWhite10,
                         contentPadding: EdgeInsets.symmetric(
@@ -197,8 +177,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8),
                         ),
-                        errorStyle: TextStyle(
-                          fontSize: isMobile ? 10 : 12,
+                        errorStyle: AppTheme.bodySmall?.copyWith(
                           color: Colors.red,
                         ),
                       ),
@@ -210,16 +189,10 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                       controller: _pass,
                       validator: Validators.validateStrongPassword,
                       obscureText: _obscureText,
-                      style: TextStyle(
-                        fontSize: isMobile ? 16 : 14,
-                        color: AppColors.textPrimary,
-                      ),
+                      style: AppTheme.bodyLarge,
                       decoration: InputDecoration(
                         labelText: "Password",
-                        labelStyle: AppTextTheme.label.copyWith(
-                          color: AppColors.textSecondary,
-                          fontSize: isMobile ? 12.sp : 14,
-                        ),
+                        labelStyle: AppTheme.label,
                         filled: true,
                         fillColor: AppColors.glassWhite10,
                         contentPadding: EdgeInsets.symmetric(
@@ -240,8 +213,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                           onPressed: () =>
                               setState(() => _obscureText = !_obscureText),
                         ),
-                        errorStyle: TextStyle(
-                          fontSize: isMobile ? 10 : 12,
+                        errorStyle: AppTheme.bodySmall?.copyWith(
                           color: Colors.red,
                         ),
                       ),
@@ -254,16 +226,10 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                       validator: (value) =>
                           Validators.validateConfirmPassword(value, _pass.text),
                       obscureText: _confirmObscureText,
-                      style: TextStyle(
-                        fontSize: isMobile ? 16 : 14,
-                        color: AppColors.textPrimary,
-                      ),
+                      style: AppTheme.bodyLarge,
                       decoration: InputDecoration(
                         labelText: "Confirm Password",
-                        labelStyle: AppTextTheme.label.copyWith(
-                          color: AppColors.textSecondary,
-                          fontSize: isMobile ? 12.sp : 14,
-                        ),
+                        labelStyle: AppTheme.label,
                         filled: true,
                         fillColor: AppColors.glassWhite10,
                         contentPadding: EdgeInsets.symmetric(
@@ -285,8 +251,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                             () => _confirmObscureText = !_confirmObscureText,
                           ),
                         ),
-                        errorStyle: TextStyle(
-                          fontSize: isMobile ? 10 : 12,
+                        errorStyle: AppTheme.bodySmall?.copyWith(
                           color: Colors.red,
                         ),
                       ),
@@ -305,10 +270,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                         Expanded(
                           child: Text(
                             "I agree to the Terms and Conditions",
-                            style: AppTextTheme.bodySmall.copyWith(
-                              color: AppColors.textSecondary,
-                              fontSize: isMobile ? 12.sp : 14,
-                            ),
+                            style: AppTheme.bodySmall,
                           ),
                         ),
                       ],
@@ -330,13 +292,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                             ? const CircularProgressIndicator(
                                 color: Colors.white,
                               )
-                            : Text(
-                                'CREATE ACCOUNT',
-                                style: AppTextTheme.button.copyWith(
-                                  color: AppColors.textPrimary,
-                                  fontSize: isMobile ? 16.sp : 14,
-                                ),
-                              ),
+                            : Text('CREATE ACCOUNT', style: AppTheme.button),
                       ),
                     ),
                     const SizedBox(height: 16),
@@ -346,17 +302,13 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                       child: RichText(
                         text: TextSpan(
                           text: "Already have an account? ",
-                          style: AppTextTheme.bodySmall.copyWith(
-                            color: AppColors.textSecondary,
-                            fontSize: isMobile ? 12.sp : 14,
-                          ),
+                          style: AppTheme.bodySmall,
                           children: [
                             TextSpan(
                               text: "  Sign In",
-                              style: AppTextTheme.bodySmall.copyWith(
+                              style: AppTheme.bodySmall?.copyWith(
                                 color: AppColors.textOriginal,
                                 fontWeight: FontWeight.bold,
-                                fontSize: isMobile ? 12.sp : 14,
                               ),
                               recognizer: TapGestureRecognizer()
                                 ..onTap = () => Get.offNamed('/login'),
@@ -398,10 +350,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
         Text(
           "Built for speed . Realtime . Collaborative",
           textAlign: TextAlign.center,
-          style: AppTextTheme.bodyMedium.copyWith(
-            color: AppColors.textPrimary,
-            fontSize: isMobile ? 14.sp : 14,
-          ),
+          style: AppTheme.bodyMedium,
         ),
       ],
     );

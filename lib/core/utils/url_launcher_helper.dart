@@ -1,4 +1,4 @@
-// utils/url_launcher_helper.dart
+// core/utils/url_launcher_helper.dart
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -11,7 +11,7 @@ class UrlLauncherHelper {
         'Error',
         'No link available for this article',
         snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.red.withValues(alpha: 0.1),
+        backgroundColor: Colors.red.withAlpha((0.1 * 255).round()),
         colorText: Colors.red,
       );
       return;
@@ -39,9 +39,7 @@ class UrlLauncherHelper {
         launched = await launchUrl(
           uri,
           mode: LaunchMode.inAppBrowserView,
-          browserConfiguration: const BrowserConfiguration(
-            showTitle: true,
-          ),
+          browserConfiguration: const BrowserConfiguration(showTitle: true),
         );
         debugPrint('UrlLauncherHelper: External launch result: $launched');
       } catch (e) {
@@ -79,20 +77,23 @@ class UrlLauncherHelper {
 
       if (!launched) {
         debugPrint(
-            'UrlLauncherHelper: All launch methods failed for URL: $cleanUrl');
+          'UrlLauncherHelper: All launch methods failed for URL: $cleanUrl',
+        );
 
         // Try one more approach - use a simpler URL format
         try {
           debugPrint(
-              'UrlLauncherHelper: Trying with simplified URL approach...');
+            'UrlLauncherHelper: Trying with simplified URL approach...',
+          );
           final simpleUri = Uri.parse(cleanUrl.replaceAll(' ', '%20'));
-          launched = await launchUrl(simpleUri,
-              mode: LaunchMode.inAppBrowserView,
-              browserConfiguration: const BrowserConfiguration(
-                showTitle: true,
-              ));
+          launched = await launchUrl(
+            simpleUri,
+            mode: LaunchMode.inAppBrowserView,
+            browserConfiguration: const BrowserConfiguration(showTitle: true),
+          );
           debugPrint(
-              'UrlLauncherHelper: Simplified URL launch result: $launched');
+            'UrlLauncherHelper: Simplified URL launch result: $launched',
+          );
         } catch (e) {
           debugPrint('UrlLauncherHelper: Simplified URL launch failed: $e');
         }
@@ -101,17 +102,17 @@ class UrlLauncherHelper {
         if (!launched && Platform.isAndroid) {
           try {
             debugPrint(
-                'UrlLauncherHelper: Trying Android-specific approach...');
+              'UrlLauncherHelper: Trying Android-specific approach...',
+            );
             // Try with a different mode that might work better on Android
             launched = await launchUrl(
               uri,
               mode: LaunchMode.inAppBrowserView,
-              browserConfiguration: const BrowserConfiguration(
-                showTitle: true,
-              ),
+              browserConfiguration: const BrowserConfiguration(showTitle: true),
             );
             debugPrint(
-                'UrlLauncherHelper: Android-specific launch result: $launched');
+              'UrlLauncherHelper: Android-specific launch result: $launched',
+            );
           } catch (e) {
             debugPrint('UrlLauncherHelper: Android-specific launch failed: $e');
           }
@@ -122,7 +123,7 @@ class UrlLauncherHelper {
             'Error',
             'Could not open the link. Please try copying the URL and opening it manually in your browser.',
             snackPosition: SnackPosition.BOTTOM,
-            backgroundColor: Colors.orange.withValues(alpha: 0.1),
+            backgroundColor: Colors.orange.withAlpha((0.1 * 255).round()),
             colorText: Colors.orange[700],
             duration: const Duration(seconds: 5),
             mainButton: TextButton(
@@ -142,7 +143,7 @@ class UrlLauncherHelper {
         'Error',
         'Invalid link format: ${e.toString()}',
         snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.red.withValues(alpha: 0.1),
+        backgroundColor: Colors.red.withAlpha((0.1 * 255).round()),
         colorText: Colors.red,
         duration: const Duration(seconds: 4),
       );

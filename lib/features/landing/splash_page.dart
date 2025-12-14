@@ -19,7 +19,12 @@ class _SplashPageState extends State<SplashPage> {
       if (TokenProvider.token == null) {
         Get.offNamed('/landing');
       } else {
-        Get.offNamed('/');
+        // Redirect based on user role
+        if (TokenProvider.isCaster) {
+          Get.offNamed('/rundown');
+        } else {
+          Get.offNamed('/dashboard');
+        }
       }
     });
   }

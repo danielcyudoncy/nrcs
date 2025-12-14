@@ -10,6 +10,7 @@ import 'features/auth/login_page.dart';
 import 'features/landing/splash_page.dart';
 import 'features/landing/landing_page.dart';
 import 'features/auth/create_account_page.dart';
+import 'features/dashboard/user_dashboard.dart';
 import 'core/services/story_service.dart';
 
 void main() async {
@@ -42,6 +43,8 @@ class NRCSApp extends StatelessWidget {
             GetPage(name: '/login', page: () => const LoginPage()),
             GetPage(name: '/splash', page: () => const SplashPage()),
             GetPage(name: '/landing', page: () => const LandingPage()),
+            GetPage(name: '/dashboard', page: () => const UserDashboard()),
+            GetPage(name: '/rundown', page: () => const RundownPage()),
             GetPage(
               name: '/create-account',
               page: () => const CreateAccountPage(),

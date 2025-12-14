@@ -3,6 +3,8 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 import 'package:get/get.dart';
+import '../../core/auth/auth_service.dart';
+import '../../core/auth/token_provider.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/validations.dart';
 
@@ -23,10 +25,33 @@ class _LoginPageState extends State<LoginPage> {
   void _login() async {
     if (_formKey.currentState!.validate()) {
       setState(() => _isLoading = true);
-      // Simulate login
-      await Future.delayed(const Duration(seconds: 2));
-      setState(() => _isLoading = false);
-      Get.offNamed('/');
+
+      try {
+        final authService = AuthService(Get.find());
+        final user = await authService.login(
+          _emailController.text,
+          _passwordController.text,
+        );
+
+        setState(() => _isLoading = false);
+
+        // Redirect based on user role
+        if (user.primaryRole == UserRole.caster) {
+          Get.offNamed('/rundown');
+        } else {
+          Get.offNamed('/dashboard');
+        }
+      } catch (e) {
+        setState(() => _isLoading = false);
+
+        // Show error message
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Login failed: ${e.toString()}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     }
   }
 
@@ -208,6 +233,34 @@ class _LoginPageState extends State<LoginPage> {
                                 color: Colors.white,
                               )
                             : Text("Sign in", style: AppTheme.button),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Demo Credentials Info
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: AppColors.glassWhite10,
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: AppColors.glassWhite20),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "Demo Credentials:",
+                            style: AppTheme.bodyMedium?.copyWith(
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.textAccent,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            "Writer: writer / password\nCaster: caster / password\nAdmin: admin / password",
+                            style: AppTheme.bodySmall,
+                          ),
+                        ],
                       ),
                     ),
                     const SizedBox(height: 16),

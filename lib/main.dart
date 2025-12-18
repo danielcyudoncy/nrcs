@@ -2,6 +2,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 import 'core/theme/app_theme.dart';
 import 'core/env.dart';
 import 'features/rundown/views/rundown_page.dart';
@@ -10,10 +12,12 @@ import 'features/landing/splash_page.dart';
 import 'features/landing/landing_page.dart';
 import 'features/auth/create_account_page.dart';
 import 'core/services/story_service.dart';
+import 'core/auth/auth_controller.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Env.init();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   runApp(const NRCSApp());
 }
 
@@ -24,6 +28,7 @@ class NRCSApp extends StatelessWidget {
   Widget build(BuildContext context) {
     // register shared services
     Get.put(StoryService(), permanent: true);
+    Get.put(AuthController(), permanent: true);
 
     return ScreenUtilInit(
       designSize: const Size(375, 812), // Standard mobile design size

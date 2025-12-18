@@ -4,9 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:nrcs/core/network/api_client.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/validations.dart';
+import '../../core/auth/auth_controller.dart';
 
 class CreateAccountPage extends StatefulWidget {
   const CreateAccountPage({super.key});
@@ -21,7 +21,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
   final _user = TextEditingController();
   final _pass = TextEditingController();
   final _confirmPass = TextEditingController();
-  bool _loading = false;
+  final _authController = Get.find<AuthController>();
   bool _agreeToTerms = false;
   bool _obscureText = true;
   bool _confirmObscureText = true;
@@ -29,7 +29,6 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
   void _create() async {
     if (_formKey.currentState!.validate()) {
       if (!_agreeToTerms) {
-        // Show snackbar or dialog to agree to terms
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Please agree to the terms and conditions'),
@@ -38,27 +37,27 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
         return;
       }
 
-      setState(() => _loading = true);
-      await ApiClient().post('/create', {
-        'username': _user.text,
-        'password': _pass.text,
-      });
-      setState(() => _loading = false);
-      Get.offNamed('/rundown');
+      try {
+        await _authController.signUp(_user.text.trim(), _pass.text);
+        Get.offNamed('/rundown');
+      } catch (e) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(e.toString())));
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.primaryBlue, // Primary background
+      backgroundColor: AppColors.primaryBlue,
       body: LayoutBuilder(
         builder: (context, constraints) {
           bool isMobile = constraints.maxWidth <= 600;
 
           return Center(
             child: Container(
-              // OUTER CONTAINER (main card frame)
               margin: EdgeInsets.all(isMobile ? 16 : 32),
               padding: EdgeInsets.all(isMobile ? 12 : 20),
               decoration: BoxDecoration(
@@ -73,7 +72,6 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                 ],
               ),
               child: Container(
-                // INNER CONTAINER (glassmorphism for login + logo)
                 padding: EdgeInsets.all(isMobile ? 16 : 24),
                 constraints: BoxConstraints(
                   maxWidth: 1200,
@@ -87,7 +85,6 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                 child: SingleChildScrollView(
                   child: isMobile
                       ? Column(
-                          // Mobile: illustration on top, login below
                           children: [
                             _buildIllustrationSection(isMobile),
                             const SizedBox(height: 24),
@@ -95,7 +92,6 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                           ],
                         )
                       : Row(
-                          // Desktop: side by side
                           children: [
                             Expanded(
                               child: _buildCreateAccountCard(context, isMobile),
@@ -117,7 +113,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
 
   Widget _buildCreateAccountCard(BuildContext context, bool isMobile) {
     return SizedBox(
-      height: isMobile ? 500 : 400, // Match illustration section height
+      height: 500,
       child: ClipRRect(
         borderRadius: BorderRadius.circular(20),
         child: BackdropFilter(
@@ -129,9 +125,9 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
               borderRadius: BorderRadius.circular(20),
               border: Border.all(color: AppColors.glassWhite30),
             ),
-            child: Form(
-              key: _formKey,
-              child: SingleChildScrollView(
+            child: SingleChildScrollView(
+              child: Form(
+                key: _formKey,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -140,7 +136,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                       style: AppTheme.headingSmall.copyWith(
                         color: AppColors.textPrimary,
                         fontWeight: FontWeight.bold,
-                        fontSize: isMobile ? 20.sp : 14,
+                        fontSize: isMobile ? 20.sp : 6.sp,
                       ),
                     ),
                     const SizedBox(height: 12),
@@ -325,8 +321,10 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                             borderRadius: BorderRadius.circular(10),
                           ),
                         ),
-                        onPressed: _loading ? null : _create,
-                        child: _loading
+                        onPressed: _authController.isLoading.value
+                            ? null
+                            : _create,
+                        child: _authController.isLoading.value
                             ? const CircularProgressIndicator(
                                 color: Colors.white,
                               )

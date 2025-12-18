@@ -15,10 +15,10 @@ class RundownPage extends StatelessWidget {
     controller.loadSample();
     final mq = MediaQuery.of(context);
     // On wide screens (web) clamp textScaleFactor so text doesn't become oversized.
-    final textScale = mq.size.width > 800 ? 1.0 : mq.textScaleFactor;
+    final clampedScale = mq.size.width > 800 ? 1.0 : mq.textScaler.scale;
 
     return MediaQuery(
-      data: mq.copyWith(textScaleFactor: textScale),
+      data: mq.copyWith(textScaler: TextScaler.linear(clampedScale as double)),
       child: Scaffold(
         appBar: AppBar(title: const Text('Rundown')),
         body: StreamBuilder<StoryEvent>(

@@ -6,6 +6,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/validations.dart';
+import '../../core/auth/auth_controller.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -18,16 +19,22 @@ class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _authController = Get.find<AuthController>();
   bool _obscureText = true;
-  bool _isLoading = false;
 
   void _login() async {
     if (_formKey.currentState!.validate()) {
-      setState(() => _isLoading = true);
-      // Simulate login
-      await Future.delayed(const Duration(seconds: 2));
-      setState(() => _isLoading = false);
-      Get.offNamed('/rundown');
+      try {
+        await _authController.signIn(
+          _emailController.text.trim(),
+          _passwordController.text,
+        );
+        Get.offNamed('/rundown');
+      } catch (e) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(e.toString())));
+      }
     }
   }
 
@@ -227,8 +234,10 @@ class _LoginPageState extends State<LoginPage> {
                             borderRadius: BorderRadius.circular(10),
                           ),
                         ),
-                        onPressed: _isLoading ? null : _login,
-                        child: _isLoading
+                        onPressed: _authController.isLoading.value
+                            ? null
+                            : _login,
+                        child: _authController.isLoading.value
                             ? const CircularProgressIndicator(
                                 color: Colors.white,
                               )

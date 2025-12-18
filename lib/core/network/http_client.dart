@@ -1,38 +1,62 @@
 // core/network/http_client.dart
-import 'package:dio/dio.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:nrcs/core/env.dart';
-import 'dart:io';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 class HttpClient {
-  static late final Dio dio;
-  static bool _isInitialized = false;
+  HttpClient(this.baseUrl);
 
-  static Future<void> init() async {
-    if (_isInitialized) return;
-    
-    // Ensure Env is initialized first to load .env variables
-    await Env.init();
-    
-    // Now initialize Dio with the correct base URL from environment
-    // Directly access the environment variables as a workaround
-    bool onLan = false;
-    try {
-      final result = await InternetAddress.lookup('10.0.0.5');
-      onLan = result.isNotEmpty;
-    } catch (_) {
-      onLan = false;
-    }
-    
-    final String baseUrl = onLan 
-      ? dotenv.env['API_BASE_LAN'] ?? 'http://10.0.0.5:3000' 
-      : dotenv.env['API_BASE_PROD'] ?? 'https://api.nrcs.example.com';
-      
-    dio = Dio(BaseOptions(baseUrl: baseUrl));
-    _isInitialized = true;
+  final String baseUrl;
+  String? token;
+
+  Map<String, String> get _headers => {
+    'Content-Type': 'application/json',
+    if (token != null) 'Authorization': 'Bearer $token',
+  };
+
+  Future<Map<String, dynamic>> get(String path) async {
+    final res = await http.get(Uri.parse('$baseUrl$path'), headers: _headers);
+    return _decode(res);
   }
 
-  static void setToken(String token) {
-    dio.options.headers['Authorization'] = 'Bearer $token';
+  Future<Map<String, dynamic>> post(
+    String path, {
+    Map<String, dynamic>? body,
+  }) async {
+    final res = await http.post(
+      Uri.parse('$baseUrl$path'),
+      headers: _headers,
+      body: jsonEncode(body),
+    );
+    return _decode(res);
+  }
+
+  Future<Map<String, dynamic>> put(
+    String path, {
+    Map<String, dynamic>? body,
+  }) async {
+    final res = await http.put(
+      Uri.parse('$baseUrl$path'),
+      headers: _headers,
+      body: jsonEncode(body),
+    );
+    return _decode(res);
+  }
+
+  Future<void> delete(String path) async {
+    final res = await http.delete(
+      Uri.parse('$baseUrl$path'),
+      headers: _headers,
+    );
+
+    if (res.statusCode >= 400) {
+      throw Exception(res.body);
+    }
+  }
+
+  Map<String, dynamic> _decode(http.Response res) {
+    if (res.statusCode < 200 || res.statusCode >= 300) {
+      throw Exception('HTTP ${res.statusCode}: ${res.body}');
+    }
+    return jsonDecode(res.body);
   }
 }

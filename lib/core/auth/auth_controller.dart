@@ -4,7 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'auth_service.dart';
 
 class AuthController extends GetxController {
-  final AuthService _authService = AuthService();
+  late final AuthService _authService;
 
   // Reactive user state
   final Rx<User?> user = Rx<User?>(null);
@@ -15,6 +15,7 @@ class AuthController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    _authService = AuthService();
     // Listen to auth state changes
     user.bindStream(_authService.authStateChanges);
   }

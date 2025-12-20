@@ -223,34 +223,6 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                     const SizedBox(height: 16),
 
-                    // Demo Credentials Info
-                    Container(
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: AppColors.glassWhite10,
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: AppColors.glassWhite20),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "Demo Credentials:",
-                            style: AppTheme.bodyMedium?.copyWith(
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.textAccent,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            "Writer: writer / password\nCaster: caster / password\nAdmin: admin / password",
-                            style: AppTheme.bodySmall,
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-
                     // Divider
                     Row(
                       children: [

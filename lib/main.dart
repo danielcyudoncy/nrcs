@@ -14,6 +14,7 @@ import 'features/auth/create_account_page.dart';
 import 'features/dashboard/user_dashboard.dart';
 import 'core/services/story_service.dart';
 import 'core/auth/auth_controller.dart';
+import 'core/utils/responsive_utils.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -30,6 +31,7 @@ class NRCSApp extends StatelessWidget {
     // register shared services
     Get.put(StoryService(), permanent: true);
     Get.put(AuthController(), permanent: true);
+    Get.put(ResponsiveController(), permanent: true);
 
     return ScreenUtilInit(
       designSize: const Size(375, 812), // Standard mobile design size

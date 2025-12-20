@@ -2,6 +2,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/validations.dart';
@@ -40,9 +41,11 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
         await _authController.signUp(_user.text.trim(), _pass.text);
         Get.offNamed('/rundown');
       } catch (e) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(e.toString())));
+        if (mounted) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(e.toString())));
+        }
       }
     }
   }
@@ -132,7 +135,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                   children: [
                     Text(
                       "Create Account",
-                      style: AppTheme.headingSmall.copyWith(
+                      style: AppTheme.headingSmall?.copyWith(
                         color: AppColors.textPrimary,
                         fontWeight: FontWeight.bold,
                         fontSize: isMobile ? 20.sp : 6.sp,

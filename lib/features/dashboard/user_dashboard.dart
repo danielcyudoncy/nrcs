@@ -36,7 +36,7 @@ class UserDashboard extends StatelessWidget {
               child: FittedBox(
                 fit: BoxFit.scaleDown,
                 child: Text(
-                  '${TokenProvider.isWriter ? 'My Scripts' : 'Broadcast Control'}',
+                  TokenProvider.isWriter ? 'My Scripts' : 'Broadcast Control',
                   style: AppTheme.headingSmall,
                 ),
               ),
@@ -699,8 +699,8 @@ class UserDashboard extends StatelessWidget {
           TextButton(onPressed: () => Get.back(), child: const Text('Cancel')),
           TextButton(
             onPressed: () {
-              final authService = AuthService(Get.find());
-              authService.logout();
+              final authService = AuthService();
+              authService.signOut();
               Get.offAllNamed('/login');
             },
             child: const Text('Logout', style: TextStyle(color: Colors.red)),

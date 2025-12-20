@@ -46,7 +46,7 @@ class AppColors {
 /// Channels App Theme Data
 class AppTheme {
   static ThemeData get lightTheme => ThemeData(
-    primarySwatch: MaterialColor(AppColors.primaryBlue.value, <int, Color>{
+    primarySwatch: MaterialColor(AppColors.primaryBlue.toARGB32(), <int, Color>{
       50: AppColors.primaryBlue.withValues(alpha: 0.1),
       100: AppColors.primaryBlue.withValues(alpha: 0.2),
       200: AppColors.primaryBlue.withValues(alpha: 0.3),

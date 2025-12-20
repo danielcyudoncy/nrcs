@@ -2,14 +2,18 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:nrcs/core/services/story_service.dart';
 
-void main(){
-  test('story service save/submit/approve/reorder', (){
-    final svc = StoryService(enableWsDemo: false);
+void main() {
+  test('story service save/submit/approve/reorder', () {
+    final svc = StoryService();
+    svc.loadDemoData(); // Explicitly load demo data for testing
     final initial = svc.list();
     expect(initial.length, greaterThanOrEqualTo(1));
 
     final s = initial.first;
-    final saved = svc.save(s.copyWith(slug: 'updated-slug', status: s.status), user: 'tester');
+    final saved = svc.save(
+      s.copyWith(slug: 'updated-slug', status: s.status),
+      user: 'tester',
+    );
     expect(saved.slug, 'updated-slug');
     expect(saved.updatedBy, 'tester');
 

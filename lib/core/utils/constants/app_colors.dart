@@ -41,6 +41,6 @@ class AppColors {
   // Additional colors for UI components
   static const Color backgroundCard = Color(0xFF1A1F2E);
   static const Color glassWhite = Colors.white;
-  static Color glassWhite10 = Colors.white.withValues(alpha: 0.1);
+  static Color glassWhite10 = Colors.white.withAlpha((0.1 * 255).round());
   static const Color textSecondary = Colors.white70;
 }

@@ -1,3 +1,4 @@
+// core/utils/responsive_utils.dart
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -18,18 +19,10 @@ class Breakpoints {
 }
 
 // Device type enumeration
-enum DeviceType {
-  mobile,
-  tablet,
-  desktop,
-  largeDesktop,
-}
+enum DeviceType { mobile, tablet, desktop, largeDesktop }
 
 // Screen orientation
-enum ScreenOrientation {
-  portrait,
-  landscape,
-}
+enum ScreenOrientation { portrait, landscape }
 
 // Responsive controller for managing screen information
 class ResponsiveController extends GetxController {
@@ -222,13 +215,11 @@ class ResponsiveBuilder extends StatelessWidget {
   final Widget Function(BuildContext)? desktop;
   final Widget Function(BuildContext)? largeDesktop;
 
-  const ResponsiveBuilder({
-    super.key,
-    required this.builder,
-  })  : mobile = null,
-        tablet = null,
-        desktop = null,
-        largeDesktop = null;
+  const ResponsiveBuilder({super.key, required this.builder})
+    : mobile = null,
+      tablet = null,
+      desktop = null,
+      largeDesktop = null;
 
   const ResponsiveBuilder.specific({
     super.key,
@@ -306,13 +297,13 @@ class ResponsiveLayout extends StatelessWidget {
     return ResponsiveBuilder(
       builder: (context, deviceType) {
         final controller = ResponsiveController.to;
-
         // Get responsive padding and margin
         final responsivePadding = padding ?? controller.getResponsivePadding();
         final responsiveMargin = margin ?? controller.getResponsiveMargin();
 
         // Get max width
-        final containerMaxWidth = maxWidth ??
+        final containerMaxWidth =
+            maxWidth ??
             controller.getResponsiveValue<double>(
               mobile: double.infinity,
               tablet: 800.0,
@@ -517,21 +508,24 @@ class ResponsiveCard extends StatelessWidget {
       builder: (context, deviceType) {
         final controller = ResponsiveController.to;
 
-        final responsivePadding = padding ??
+        final responsivePadding =
+            padding ??
             controller.getResponsivePadding(
               mobile: 12.0,
               tablet: 16.0,
               desktop: 20.0,
             );
 
-        final responsiveMargin = margin ??
+        final responsiveMargin =
+            margin ??
             controller.getResponsiveMargin(
               mobile: 4.0,
               tablet: 6.0,
               desktop: 8.0,
             );
 
-        final responsiveElevation = elevation ??
+        final responsiveElevation =
+            elevation ??
             controller.getResponsiveValue(
               mobile: 2.0,
               tablet: 4.0,
@@ -545,10 +539,7 @@ class ResponsiveCard extends StatelessWidget {
             borderRadius: borderRadius ?? BorderRadius.circular(8),
           ),
           margin: responsiveMargin,
-          child: Padding(
-            padding: responsivePadding,
-            child: child,
-          ),
+          child: Padding(padding: responsivePadding, child: child),
         );
       },
     );
@@ -613,4 +604,45 @@ class ResponsiveUtils {
     if (isTablet(context)) return tablet;
     return mobile;
   }
+}
+
+// Responsive text theme
+class ResponsiveTextTheme {
+  static const double _mobileBaseFontSize = 14.0;
+  static const double _tabletBaseFontSize = 16.0;
+  static const double _desktopBaseFontSize = 18.0;
+
+  static TextTheme get textTheme {
+    return TextTheme(
+      displayLarge: _getTextStyle(_desktopBaseFontSize * 2.5),
+      displayMedium: _getTextStyle(_desktopBaseFontSize * 2.0),
+      displaySmall: _getTextStyle(_desktopBaseFontSize * 1.75),
+      headlineLarge: _getTextStyle(_desktopBaseFontSize * 1.5),
+      headlineMedium: _getTextStyle(_desktopBaseFontSize * 1.25),
+      headlineSmall: _getTextStyle(_desktopBaseFontSize * 1.125),
+      titleLarge: _getTextStyle(_desktopBaseFontSize * 1.0),
+      titleMedium: _getTextStyle(_mobileBaseFontSize * 1.25),
+      titleSmall: _getTextStyle(_mobileBaseFontSize * 1.125),
+      bodyLarge: _getTextStyle(_mobileBaseFontSize),
+      bodyMedium: _getTextStyle(_mobileBaseFontSize * 0.875),
+      bodySmall: _getTextStyle(_mobileBaseFontSize * 0.75),
+      labelLarge: _getTextStyle(_mobileBaseFontSize * 0.875),
+      labelMedium: _getTextStyle(_mobileBaseFontSize * 0.75),
+      labelSmall: _getTextStyle(_mobileBaseFontSize * 0.625),
+    );
+  }
+
+  static TextStyle _getTextStyle(double desktopFontSize) {
+    return TextStyle(
+      fontSize: ResponsiveController.to.getResponsiveValue(
+        mobile: desktopFontSize * 0.8,
+        tablet: desktopFontSize * 0.9,
+        desktop: desktopFontSize,
+      ),
+    );
+  }
+
+  static double get mobileBaseFontSize => _mobileBaseFontSize;
+  static double get tabletBaseFontSize => _tabletBaseFontSize;
+  static double get desktopBaseFontSize => _desktopBaseFontSize;
 }

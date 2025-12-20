@@ -19,7 +19,12 @@ class _SplashPageState extends State<SplashPage> {
       if (TokenProvider.token == null) {
         Get.offNamed('/landing');
       } else {
-        Get.offNamed('/');
+        // Redirect based on user role
+        if (TokenProvider.isCaster) {
+          Get.offNamed('/rundown');
+        } else {
+          Get.offNamed('/dashboard');
+        }
       }
     });
   }
@@ -29,16 +34,27 @@ class _SplashPageState extends State<SplashPage> {
     return Scaffold(
       body: Container(
         decoration: const BoxDecoration(
-          gradient: LinearGradient(colors: [AppColors.backgroundDark, AppColors.primaryBlue], begin: Alignment.topLeft, end: Alignment.bottomRight),
+          gradient: LinearGradient(
+            colors: [AppColors.backgroundDark, AppColors.primaryBlue],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
         ),
         child: Center(
-          child: Column(mainAxisSize: MainAxisSize.min, children: [
-            Icon(Icons.wifi_tethering, size: 96, color: AppColors.textSecondary),
-            SizedBox(height: 16),
-            Text('NRCS', style: AppTheme.headingMedium.copyWith(color: AppColors.textPrimary)),
-            SizedBox(height: 8),
-            Text('News Rundown Control System', style: AppTextTheme.bodyMedium.copyWith(color: AppColors.textSecondary)),
-          ]),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                Icons.wifi_tethering,
+                size: 96,
+                color: AppColors.textSecondary,
+              ),
+              const SizedBox(height: 16),
+              Text('NRCS', style: AppTheme.headingMedium),
+              const SizedBox(height: 8),
+              Text('News Rundown Control System', style: AppTheme.bodyMedium),
+            ],
+          ),
         ),
       ),
     );

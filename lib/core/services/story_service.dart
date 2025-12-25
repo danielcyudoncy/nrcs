@@ -153,4 +153,26 @@ class StoryService {
       StoryEvent(type: StoryEventType.list, list: List.unmodifiable(_items)),
     );
   }
+
+  Story add(
+    String slug, {
+    String status = 'pending',
+    String script = '',
+    String? user,
+  }) {
+    final id = _rng.v4();
+    final orderNo = _items.length + 1;
+    final story = Story(
+      id: id,
+      slug: slug,
+      orderNo: orderNo,
+      status: status,
+      script: script,
+      version: 1,
+      updatedBy: user,
+    );
+    _items.add(story);
+    _ctrl.add(StoryEvent(type: StoryEventType.upsert, story: story));
+    return story;
+  }
 }

@@ -6,6 +6,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'core/env.dart';
 import 'features/rundown/views/rundown_page.dart';
+import 'features/rundown/views/story_create_page.dart';
 import 'features/auth/login_page.dart';
 import 'features/landing/splash_page.dart';
 import 'features/landing/landing_page.dart';
@@ -61,6 +62,10 @@ class _NRCSAppState extends State<NRCSApp> {
               GetPage(name: '/landing', page: () => const LandingPage()),
               GetPage(name: '/dashboard', page: () => const UserDashboard()),
               GetPage(name: '/rundown', page: () => const RundownPage()),
+              GetPage(
+                name: '/create-story',
+                page: () => const StoryCreatePage(),
+              ),
               GetPage(
                 name: '/create-account',
                 page: () => const CreateAccountPage(),

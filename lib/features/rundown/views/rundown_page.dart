@@ -84,7 +84,7 @@ class RundownPage extends StatelessWidget {
               Icons.add,
               color: Theme.of(context).appBarTheme.foregroundColor,
             ),
-            onPressed: () {},
+            onPressed: () => Get.toNamed('/create-story'),
           ),
           PopupMenuButton<String>(
             icon: Icon(

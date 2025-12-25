@@ -4,7 +4,6 @@ import 'package:get/get.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
-import 'core/theme/app_theme.dart';
 import 'core/env.dart';
 import 'features/rundown/views/rundown_page.dart';
 import 'features/auth/login_page.dart';
@@ -15,6 +14,7 @@ import 'features/dashboard/user_dashboard.dart';
 import 'core/services/story_service.dart';
 import 'core/auth/auth_controller.dart';
 import 'core/utils/responsive_utils.dart';
+import 'core/utils/theme_controller.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -23,38 +23,50 @@ void main() async {
   runApp(const NRCSApp());
 }
 
-class NRCSApp extends StatelessWidget {
+class NRCSApp extends StatefulWidget {
   const NRCSApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  State<NRCSApp> createState() => _NRCSAppState();
+}
+
+class _NRCSAppState extends State<NRCSApp> {
+  @override
+  void initState() {
+    super.initState();
     // register shared services
     Get.put(StoryService(), permanent: true);
     Get.put(AuthController(), permanent: true);
     Get.put(ResponsiveController(), permanent: true);
+    Get.put(ThemeController(), permanent: true);
+  }
 
+  @override
+  Widget build(BuildContext context) {
     return ScreenUtilInit(
       designSize: const Size(375, 812), // Standard mobile design size
       minTextAdapt: false,
       splitScreenMode: true,
       builder: (context, child) {
-        return GetMaterialApp(
-          debugShowCheckedModeBanner: false,
-          title: 'NRCS',
-          theme: AppTheme.lightTheme,
-          initialRoute: '/splash',
-          getPages: [
-            GetPage(name: '/', page: () => const RundownPage()),
-            GetPage(name: '/login', page: () => const LoginPage()),
-            GetPage(name: '/splash', page: () => const SplashPage()),
-            GetPage(name: '/landing', page: () => const LandingPage()),
-            GetPage(name: '/dashboard', page: () => const UserDashboard()),
-            GetPage(name: '/rundown', page: () => const RundownPage()),
-            GetPage(
-              name: '/create-account',
-              page: () => const CreateAccountPage(),
-            ),
-          ],
+        return GetBuilder<ThemeController>(
+          builder: (themeCtrl) => GetMaterialApp(
+            debugShowCheckedModeBanner: false,
+            title: 'NRCS',
+            theme: themeCtrl.currentTheme,
+            initialRoute: '/splash',
+            getPages: [
+              GetPage(name: '/', page: () => const RundownPage()),
+              GetPage(name: '/login', page: () => const LoginPage()),
+              GetPage(name: '/splash', page: () => const SplashPage()),
+              GetPage(name: '/landing', page: () => const LandingPage()),
+              GetPage(name: '/dashboard', page: () => const UserDashboard()),
+              GetPage(name: '/rundown', page: () => const RundownPage()),
+              GetPage(
+                name: '/create-account',
+                page: () => const CreateAccountPage(),
+              ),
+            ],
+          ),
         );
       },
     );

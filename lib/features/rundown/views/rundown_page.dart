@@ -5,6 +5,7 @@ import 'package:nrcs/core/services/story_service.dart';
 import 'package:nrcs/core/models/story.dart';
 import 'package:nrcs/core/theme/app_theme.dart';
 import 'package:nrcs/core/utils/responsive_utils.dart';
+import 'package:nrcs/features/rundown/views/settings_page.dart';
 import 'package:nrcs/features/scripts/views/script_editor_page.dart';
 
 class RundownPage extends StatelessWidget {
@@ -15,12 +16,15 @@ class RundownPage extends StatelessWidget {
     final svc = Get.put(StoryService());
 
     return Scaffold(
-      backgroundColor: AppColors.backgroundDark,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: AppColors.primaryBlue,
+        backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.menu, color: Colors.white),
+          icon: Icon(
+            Icons.menu,
+            color: Theme.of(context).appBarTheme.foregroundColor,
+          ),
           onPressed: () {},
         ),
         title: Row(
@@ -37,7 +41,12 @@ class RundownPage extends StatelessWidget {
             Flexible(
               child: FittedBox(
                 fit: BoxFit.scaleDown,
-                child: Text('RUNDOWN CONTROL', style: AppTheme.headingSmall),
+                child: Text(
+                  'RUNDOWN CONTROL',
+                  style: AppTheme.headingSmall?.copyWith(
+                    color: Theme.of(context).appBarTheme.foregroundColor,
+                  ),
+                ),
               ),
             ),
           ],
@@ -71,14 +80,21 @@ class RundownPage extends StatelessWidget {
             ),
           ),
           IconButton(
-            icon: const Icon(Icons.add, color: Colors.white),
+            icon: Icon(
+              Icons.add,
+              color: Theme.of(context).appBarTheme.foregroundColor,
+            ),
             onPressed: () {},
           ),
           PopupMenuButton<String>(
-            icon: const Icon(Icons.more_vert, color: Colors.white),
+            icon: Icon(
+              Icons.more_vert,
+              color: Theme.of(context).appBarTheme.foregroundColor,
+            ),
             onSelected: (value) {
               switch (value) {
                 case 'settings':
+                  Get.to(() => const SettingsPage());
                   break;
                 case 'refresh':
                   svc.refresh();
@@ -131,12 +147,14 @@ class RundownPage extends StatelessWidget {
                     child: Row(
                       children: [
                         _buildStatCard(
+                          context,
                           'Total Stories',
                           stories.length.toString(),
                           Icons.article,
                         ),
                         const SizedBox(width: 8),
                         _buildStatCard(
+                          context,
                           'In Progress',
                           stories
                               .where((s) => s.status == 'in_progress')
@@ -146,6 +164,7 @@ class RundownPage extends StatelessWidget {
                         ),
                         const SizedBox(width: 8),
                         _buildStatCard(
+                          context,
                           'Ready',
                           stories
                               .where((s) => s.status == 'ready')
@@ -162,7 +181,7 @@ class RundownPage extends StatelessWidget {
                     child: Container(
                       margin: const EdgeInsets.symmetric(horizontal: 12),
                       child: stories.isEmpty
-                          ? _buildEmptyState()
+                          ? _buildEmptyState(context)
                           : ReorderableListView.builder(
                               itemCount: stories.length,
                               onReorder: (oldIndex, newIndex) {
@@ -173,6 +192,7 @@ class RundownPage extends StatelessWidget {
                                 final s = stories[i];
                                 return _buildStoryCard(
                                   key: ValueKey(s.id),
+                                  context: context,
                                   story: s,
                                   index: i,
                                   onTap: () =>
@@ -191,7 +211,7 @@ class RundownPage extends StatelessWidget {
     );
   }
 
-  Widget _buildEmptyState() {
+  Widget _buildEmptyState(BuildContext context) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -199,20 +219,24 @@ class RundownPage extends StatelessWidget {
           Icon(
             Icons.article_outlined,
             size: 64,
-            color: AppColors.textSecondary,
+            color: Theme.of(context).textTheme.bodySmall?.color?.withAlpha(179),
           ),
           const SizedBox(height: 16),
           Text(
             'No stories yet',
             style: AppTheme.headingSmall?.copyWith(
-              color: AppColors.textSecondary,
+              color: Theme.of(
+                context,
+              ).textTheme.bodySmall?.color?.withAlpha(179),
             ),
           ),
           const SizedBox(height: 8),
           Text(
             'Add your first story or load demo data',
             style: AppTheme.bodyMedium?.copyWith(
-              color: AppColors.textSecondary,
+              color: Theme.of(
+                context,
+              ).textTheme.bodySmall?.color?.withAlpha(179),
             ),
           ),
           const SizedBox(height: 24),
@@ -233,16 +257,19 @@ class RundownPage extends StatelessWidget {
     );
   }
 
-  Widget _buildStatCard(String title, String value, IconData icon) {
+  Widget _buildStatCard(
+    BuildContext context,
+    String title,
+    String value,
+    IconData icon,
+  ) {
     return Expanded(
       child: Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: AppColors.backgroundCard,
+          color: Theme.of(context).cardTheme.color,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: Colors.white.withAlpha((0.1 * 255).round()),
-          ),
+          border: Border.all(color: Theme.of(context).dividerColor),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -251,11 +278,21 @@ class RundownPage extends StatelessWidget {
               children: [
                 Icon(icon, color: AppColors.glassBlue, size: 16),
                 const SizedBox(width: 6),
-                Text(value, style: AppTheme.bodyLarge),
+                Text(
+                  value,
+                  style: AppTheme.bodyLarge?.copyWith(
+                    color: Theme.of(context).textTheme.bodyLarge?.color,
+                  ),
+                ),
               ],
             ),
             const SizedBox(height: 2),
-            Text(title, style: AppTheme.bodySmall),
+            Text(
+              title,
+              style: AppTheme.bodySmall?.copyWith(
+                color: Theme.of(context).textTheme.bodySmall?.color,
+              ),
+            ),
           ],
         ),
       ),
@@ -264,6 +301,7 @@ class RundownPage extends StatelessWidget {
 
   Widget _buildStoryCard({
     Key? key,
+    required BuildContext context,
     required Story story,
     required int index,
     required VoidCallback onTap,
@@ -277,7 +315,7 @@ class RundownPage extends StatelessWidget {
       child: Card(
         elevation: 2,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        color: AppColors.backgroundCard,
+        color: Theme.of(context).cardTheme.color,
         child: InkWell(
           onTap: onTap,
           borderRadius: BorderRadius.circular(12),
@@ -314,7 +352,9 @@ class RundownPage extends StatelessWidget {
                     children: [
                       Text(
                         story.slug,
-                        style: AppTheme.bodyMedium,
+                        style: AppTheme.bodyMedium?.copyWith(
+                          color: Theme.of(context).textTheme.bodyMedium?.color,
+                        ),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -342,7 +382,11 @@ class RundownPage extends StatelessWidget {
                             const SizedBox(width: 3),
                             Text(
                               'by ${story.updatedBy}',
-                              style: AppTheme.bodySmall,
+                              style: AppTheme.bodySmall?.copyWith(
+                                color: Theme.of(
+                                  context,
+                                ).textTheme.bodySmall?.color,
+                              ),
                             ),
                           ],
                         ],

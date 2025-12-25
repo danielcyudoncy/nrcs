@@ -101,6 +101,67 @@ class AppTheme {
     ),
   );
 
+  static ThemeData get darkTheme => ThemeData(
+    brightness: Brightness.dark,
+    primarySwatch: MaterialColor(AppColors.primaryBlue.toARGB32(), <int, Color>{
+      50: AppColors.primaryBlue.withValues(alpha: 0.1),
+      100: AppColors.primaryBlue.withValues(alpha: 0.2),
+      200: AppColors.primaryBlue.withValues(alpha: 0.3),
+      300: AppColors.primaryBlue.withValues(alpha: 0.4),
+      400: AppColors.primaryBlue.withValues(alpha: 0.5),
+      500: AppColors.primaryBlue.withValues(alpha: 0.6),
+      600: AppColors.primaryBlue.withValues(alpha: 0.7),
+      700: AppColors.primaryBlue.withValues(alpha: 0.8),
+      800: AppColors.primaryBlue.withValues(alpha: 0.9),
+      900: AppColors.primaryBlue,
+    }),
+    scaffoldBackgroundColor: Colors.black,
+    textTheme: ResponsiveTextTheme.textTheme.apply(
+      bodyColor: Colors.white,
+      displayColor: Colors.white,
+      fontFamily: 'raleway',
+    ),
+    appBarTheme: AppBarTheme(
+      backgroundColor: AppColors.primaryBlue,
+      foregroundColor: Colors.white,
+    ),
+    elevatedButtonTheme: ElevatedButtonThemeData(
+      style: ElevatedButton.styleFrom(
+        backgroundColor: AppColors.buttonPrimary,
+        foregroundColor: Colors.white,
+        textStyle: ResponsiveTextTheme.textTheme.labelLarge,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10.r),
+        ),
+        padding: EdgeInsets.symmetric(vertical: 16.h, horizontal: 24.w),
+      ),
+    ),
+    inputDecorationTheme: InputDecorationTheme(
+      filled: true,
+      fillColor: Colors.grey[800],
+      labelStyle: ResponsiveTextTheme.textTheme.bodyMedium?.copyWith(
+        color: Colors.white70,
+      ),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(8.r),
+        borderSide: BorderSide(color: Colors.white24),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(8.r),
+        borderSide: BorderSide(color: Colors.white24),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(8.r),
+        borderSide: BorderSide(color: AppColors.accentRed),
+      ),
+    ),
+    cardTheme: CardThemeData(
+      color: Colors.grey[900],
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15.r)),
+      elevation: 0,
+    ),
+  );
+
   // Import text styles for direct access
   static TextStyle? get headingLarge =>
       ResponsiveTextTheme.textTheme.displayLarge;

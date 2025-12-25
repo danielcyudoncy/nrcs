@@ -4,6 +4,7 @@
 import 'package:firebase_core/firebase_core.dart' show FirebaseOptions;
 import 'package:flutter/foundation.dart'
     show defaultTargetPlatform, kIsWeb, TargetPlatform;
+import 'package:flutter_dotenv/flutter_dotenv.dart' show dotenv;
 
 /// Default [FirebaseOptions] for use with your Firebase apps.
 ///
@@ -47,31 +48,31 @@ class DefaultFirebaseOptions {
     }
   }
 
-  static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyCDHxKeWhPAVpm5ZXgD6UqP8aR3DRcQoh0',
-    appId: '1:1037956874722:web:b3856f58f4c8f88874f9bb',
-    messagingSenderId: '1037956874722',
-    projectId: 'nrcs-8301e',
-    authDomain: 'nrcs-8301e.firebaseapp.com',
-    databaseURL: 'https://nrcs-8301e-default-rtdb.firebaseio.com',
-    storageBucket: 'nrcs-8301e.firebasestorage.app',
+  static final FirebaseOptions web = FirebaseOptions(
+    apiKey: dotenv.env['FIREBASE_API_KEY'] ?? '',
+    appId: dotenv.env['FIREBASE_WEB_APP_ID'] ?? '',
+    messagingSenderId: dotenv.env['FIREBASE_MESSAGING_SENDER_ID'] ?? '',
+    projectId: dotenv.env['FIREBASE_PROJECT_ID'] ?? '',
+    authDomain: dotenv.env['FIREBASE_AUTH_DOMAIN'] ?? '',
+    databaseURL: dotenv.env['FIREBASE_DATABASE_URL'] ?? '',
+    storageBucket: dotenv.env['FIREBASE_STORAGE_BUCKET'] ?? '',
   );
 
-  static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyCDHxKeWhPAVpm5ZXgD6UqP8aR3DRcQoh0',
-    appId: '1:1037956874722:android:your_android_app_id',
-    messagingSenderId: '1037956874722',
-    projectId: 'nrcs-8301e',
-    databaseURL: 'https://nrcs-8301e-default-rtdb.firebaseio.com',
-    storageBucket: 'nrcs-8301e.firebasestorage.app',
+  static final FirebaseOptions android = FirebaseOptions(
+    apiKey: dotenv.env['FIREBASE_API_KEY'] ?? '',
+    appId: dotenv.env['FIREBASE_ANDROID_APP_ID'] ?? '',
+    messagingSenderId: dotenv.env['FIREBASE_MESSAGING_SENDER_ID'] ?? '',
+    projectId: dotenv.env['FIREBASE_PROJECT_ID'] ?? '',
+    databaseURL: dotenv.env['FIREBASE_DATABASE_URL'] ?? '',
+    storageBucket: dotenv.env['FIREBASE_STORAGE_BUCKET'] ?? '',
   );
 
-  static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyCDHxKeWhPAVpm5ZXgD6UqP8aR3DRcQoh0',
-    appId: '1:1037956874722:ios:your_ios_app_id',
-    messagingSenderId: '1037956874722',
-    projectId: 'nrcs-8301e',
-    databaseURL: 'https://nrcs-8301e-default-rtdb.firebaseio.com',
-    storageBucket: 'nrcs-8301e.firebasestorage.app',
+  static final FirebaseOptions ios = FirebaseOptions(
+    apiKey: dotenv.env['FIREBASE_API_KEY'] ?? '',
+    appId: dotenv.env['FIREBASE_IOS_APP_ID'] ?? '',
+    messagingSenderId: dotenv.env['FIREBASE_MESSAGING_SENDER_ID'] ?? '',
+    projectId: dotenv.env['FIREBASE_PROJECT_ID'] ?? '',
+    databaseURL: dotenv.env['FIREBASE_DATABASE_URL'] ?? '',
+    storageBucket: dotenv.env['FIREBASE_STORAGE_BUCKET'] ?? '',
   );
 }

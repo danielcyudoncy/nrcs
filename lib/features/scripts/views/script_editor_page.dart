@@ -31,6 +31,7 @@ class _ScriptEditorPageState extends State<ScriptEditorPage> {
     _quillController = QuillController.basic();
     _focusNode = FocusNode();
     _scrollController = ScrollController();
+    _quillController.addListener(() => setState(() {}));
     try {
       final delta = jsonDecode(ctrl.content.value) as List;
       _quillController.document = Document.fromJson(delta);
@@ -122,47 +123,110 @@ class _ScriptEditorPageState extends State<ScriptEditorPage> {
                     onPressed: () =>
                         _quillController.formatSelection(Attribute.bold),
                     icon: Icon(Icons.format_bold),
+                    color:
+                        _quillController
+                            .getSelectionStyle()
+                            .attributes
+                            .containsKey(Attribute.bold)
+                        ? Colors.blue
+                        : null,
                   ),
                   IconButton(
                     onPressed: () =>
                         _quillController.formatSelection(Attribute.italic),
                     icon: Icon(Icons.format_italic),
+                    color:
+                        _quillController
+                            .getSelectionStyle()
+                            .attributes
+                            .containsKey(Attribute.italic)
+                        ? Colors.blue
+                        : null,
                   ),
                   IconButton(
                     onPressed: () =>
                         _quillController.formatSelection(Attribute.underline),
                     icon: Icon(Icons.format_underline),
+                    color:
+                        _quillController
+                            .getSelectionStyle()
+                            .attributes
+                            .containsKey(Attribute.underline)
+                        ? Colors.blue
+                        : null,
                   ),
                   IconButton(
                     onPressed: () => _quillController.formatSelection(
                       Attribute.strikeThrough,
                     ),
                     icon: Icon(Icons.strikethrough_s),
+                    color:
+                        _quillController
+                            .getSelectionStyle()
+                            .attributes
+                            .containsKey(Attribute.strikeThrough)
+                        ? Colors.blue
+                        : null,
                   ),
                   IconButton(
                     onPressed: () =>
                         _quillController.formatSelection(Attribute.ol),
                     icon: Icon(Icons.list),
+                    color:
+                        _quillController
+                            .getSelectionStyle()
+                            .attributes
+                            .containsKey(Attribute.ol)
+                        ? Colors.blue
+                        : null,
                   ),
                   IconButton(
                     onPressed: () =>
                         _quillController.formatSelection(Attribute.ul),
                     icon: Icon(Icons.list_alt),
+                    color:
+                        _quillController
+                            .getSelectionStyle()
+                            .attributes
+                            .containsKey(Attribute.ul)
+                        ? Colors.blue
+                        : null,
                   ),
                   IconButton(
                     onPressed: () =>
                         _quillController.formatSelection(Attribute.blockQuote),
                     icon: Icon(Icons.format_quote),
+                    color:
+                        _quillController
+                            .getSelectionStyle()
+                            .attributes
+                            .containsKey(Attribute.blockQuote)
+                        ? Colors.blue
+                        : null,
                   ),
                   IconButton(
                     onPressed: () =>
                         _quillController.formatSelection(Attribute.codeBlock),
                     icon: Icon(Icons.code),
+                    color:
+                        _quillController
+                            .getSelectionStyle()
+                            .attributes
+                            .containsKey(Attribute.codeBlock)
+                        ? Colors.blue
+                        : null,
                   ),
                   IconButton(
                     onPressed: () =>
                         _quillController.formatSelection(Attribute.link),
                     icon: Icon(Icons.link),
+                    color:
+                        _quillController
+                            .getSelectionStyle()
+                            .attributes
+                            .containsKey(Attribute.link)
+                        ? Colors.blue
+                        : null,
                   ),
                 ],
               ),

@@ -1,4 +1,5 @@
 // features/rundown/views/story_create_page.dart
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_quill/flutter_quill.dart';
@@ -45,7 +46,7 @@ class _StoryCreatePageState extends State<StoryCreatePage> {
       svc.add(
         _slugController.text.trim(),
         status: _status,
-        script: _quillController.document.toPlainText(),
+        script: jsonEncode(_quillController.document.toDelta().toJson()),
       );
       Get.back();
     }
@@ -110,6 +111,61 @@ class _StoryCreatePageState extends State<StoryCreatePage> {
                     _status = value!;
                   });
                 },
+              ),
+              const SizedBox(height: 16),
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: [
+                    IconButton(
+                      onPressed: () =>
+                          _quillController.formatSelection(Attribute.bold),
+                      icon: Icon(Icons.format_bold),
+                    ),
+                    IconButton(
+                      onPressed: () =>
+                          _quillController.formatSelection(Attribute.italic),
+                      icon: Icon(Icons.format_italic),
+                    ),
+                    IconButton(
+                      onPressed: () =>
+                          _quillController.formatSelection(Attribute.underline),
+                      icon: Icon(Icons.format_underline),
+                    ),
+                    IconButton(
+                      onPressed: () => _quillController.formatSelection(
+                        Attribute.strikeThrough,
+                      ),
+                      icon: Icon(Icons.strikethrough_s),
+                    ),
+                    IconButton(
+                      onPressed: () =>
+                          _quillController.formatSelection(Attribute.ol),
+                      icon: Icon(Icons.list),
+                    ),
+                    IconButton(
+                      onPressed: () =>
+                          _quillController.formatSelection(Attribute.ul),
+                      icon: Icon(Icons.list_alt),
+                    ),
+                    IconButton(
+                      onPressed: () => _quillController.formatSelection(
+                        Attribute.blockQuote,
+                      ),
+                      icon: Icon(Icons.format_quote),
+                    ),
+                    IconButton(
+                      onPressed: () =>
+                          _quillController.formatSelection(Attribute.codeBlock),
+                      icon: Icon(Icons.code),
+                    ),
+                    IconButton(
+                      onPressed: () =>
+                          _quillController.formatSelection(Attribute.link),
+                      icon: Icon(Icons.link),
+                    ),
+                  ],
+                ),
               ),
               const SizedBox(height: 16),
               Expanded(

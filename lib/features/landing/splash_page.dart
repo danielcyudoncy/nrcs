@@ -20,7 +20,10 @@ class _SplashPageState extends State<SplashPage> {
         Get.offNamed('/landing');
       } else {
         // Redirect based on user role
-        if (TokenProvider.isCaster) {
+        if (TokenProvider.isAnchor ||
+            TokenProvider.isProducer ||
+            TokenProvider.isEditor ||
+            TokenProvider.isAdmin) {
           Get.offNamed('/rundown');
         } else {
           Get.offNamed('/dashboard');

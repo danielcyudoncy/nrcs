@@ -27,18 +27,12 @@ class UserDashboard extends StatelessWidget {
         ),
         title: Row(
           children: [
-            Icon(
-              TokenProvider.isWriter ? Icons.edit : Icons.tv,
-              color: Colors.white,
-            ),
+            Icon(Icons.edit, color: Colors.white),
             const SizedBox(width: 12),
             Flexible(
               child: FittedBox(
                 fit: BoxFit.scaleDown,
-                child: Text(
-                  TokenProvider.isWriter ? 'My Scripts' : 'Broadcast Control',
-                  style: AppTheme.headingSmall,
-                ),
+                child: Text('My Scripts', style: AppTheme.headingSmall),
               ),
             ),
           ],
@@ -66,15 +60,6 @@ class UserDashboard extends StatelessWidget {
                   title: Text('Settings', style: AppTheme.bodyMedium),
                 ),
               ),
-              if (TokenProvider.isWriter) ...[
-                PopupMenuItem(
-                  value: 'loadDemo',
-                  child: ListTile(
-                    leading: const Icon(Icons.play_circle),
-                    title: Text('Load Demo Data', style: AppTheme.bodyMedium),
-                  ),
-                ),
-              ],
             ],
           ),
         ],
@@ -87,11 +72,9 @@ class UserDashboard extends StatelessWidget {
           final stories = ev.list ?? svc.list();
 
           // Filter stories based on user role
-          final filteredStories = TokenProvider.isWriter
-              ? stories
-                    .where((s) => s.updatedBy == TokenProvider.username)
-                    .toList()
-              : stories.where((s) => s.status == 'ready').toList();
+          final filteredStories = stories
+              .where((s) => s.updatedBy == TokenProvider.username)
+              .toList();
 
           return ResponsiveBuilder(
             builder: (context, deviceType) {
@@ -103,13 +86,9 @@ class UserDashboard extends StatelessWidget {
                     child: Row(
                       children: [
                         _buildStatCard(
-                          TokenProvider.isWriter
-                              ? 'My Scripts'
-                              : 'Ready Scripts',
+                          'My Scripts',
                           filteredStories.length.toString(),
-                          TokenProvider.isWriter
-                              ? Icons.edit
-                              : Icons.check_circle,
+                          Icons.edit,
                         ),
                         const SizedBox(width: 8),
                         _buildStatCard(
@@ -118,9 +97,7 @@ class UserDashboard extends StatelessWidget {
                               .where(
                                 (s) =>
                                     s.status == 'in_progress' &&
-                                    (TokenProvider.isWriter
-                                        ? s.updatedBy == TokenProvider.username
-                                        : true),
+                                    s.updatedBy == TokenProvider.username,
                               )
                               .length
                               .toString(),
@@ -133,9 +110,7 @@ class UserDashboard extends StatelessWidget {
                               .where(
                                 (s) =>
                                     s.status == 'ready' &&
-                                    (TokenProvider.isWriter
-                                        ? s.updatedBy == TokenProvider.username
-                                        : true),
+                                    s.updatedBy == TokenProvider.username,
                               )
                               .length
                               .toString(),
@@ -151,9 +126,7 @@ class UserDashboard extends StatelessWidget {
                       margin: const EdgeInsets.symmetric(horizontal: 12),
                       child: filteredStories.isEmpty
                           ? _buildEmptyState(context)
-                          : TokenProvider.isWriter
-                          ? _buildWriterList(svc, filteredStories)
-                          : _buildCasterList(svc, filteredStories),
+                          : _buildScriptList(svc, filteredStories),
                     ),
                   ),
                 ],
@@ -162,13 +135,11 @@ class UserDashboard extends StatelessWidget {
           );
         },
       ),
-      floatingActionButton: TokenProvider.isWriter
-          ? FloatingActionButton(
-              onPressed: () => _createNewScript(context),
-              backgroundColor: AppColors.buttonPrimary,
-              child: const Icon(Icons.add, color: Colors.white),
-            )
-          : null,
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => _createNewScript(context),
+        backgroundColor: AppColors.buttonPrimary,
+        child: const Icon(Icons.add, color: Colors.white),
+      ),
     );
   }
 
@@ -206,44 +177,37 @@ class UserDashboard extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            TokenProvider.isWriter ? Icons.edit_note : Icons.tv,
-            size: 64,
-            color: AppColors.textSecondary,
-          ),
+          Icon(Icons.edit_note, size: 64, color: AppColors.textSecondary),
           const SizedBox(height: 16),
           Text(
-            TokenProvider.isWriter ? 'No scripts yet' : 'No ready scripts',
+            'No scripts yet',
             style: AppTheme.headingSmall?.copyWith(
               color: AppColors.textSecondary,
             ),
           ),
           const SizedBox(height: 8),
           Text(
-            TokenProvider.isWriter
-                ? 'Create your first script to get started'
-                : 'Scripts will appear here when marked as ready',
+            'Create your first script to get started',
             style: AppTheme.bodyMedium?.copyWith(
               color: AppColors.textSecondary,
             ),
           ),
           const SizedBox(height: 24),
-          if (TokenProvider.isWriter)
-            ElevatedButton.icon(
-              onPressed: () => _createNewScript(context),
-              icon: const Icon(Icons.add),
-              label: const Text('Create Script'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.buttonPrimary,
-                foregroundColor: AppColors.textPrimary,
-              ),
+          ElevatedButton.icon(
+            onPressed: () => _createNewScript(context),
+            icon: const Icon(Icons.add),
+            label: const Text('Create Script'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.buttonPrimary,
+              foregroundColor: AppColors.textPrimary,
             ),
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildWriterList(StoryService svc, List<Story> stories) {
+  Widget _buildScriptList(StoryService svc, List<Story> stories) {
     return ReorderableListView.builder(
       itemCount: stories.length,
       onReorder: (oldIndex, newIndex) {
@@ -258,21 +222,6 @@ class UserDashboard extends StatelessWidget {
           index: i,
           onTap: () => Get.to(() => ScriptEditorPage(story: s)),
           onStatusChange: (newStatus) => _updateScriptStatus(svc, s, newStatus),
-        );
-      },
-    );
-  }
-
-  Widget _buildCasterList(StoryService svc, List<Story> stories) {
-    return ListView.builder(
-      itemCount: stories.length,
-      itemBuilder: (context, i) {
-        final s = stories[i];
-        return _buildBroadcastCard(
-          key: ValueKey(s.id),
-          story: s,
-          index: i,
-          onTap: () => Get.to(() => ScriptEditorPage(story: s)),
         );
       },
     );
@@ -419,76 +368,6 @@ class UserDashboard extends StatelessWidget {
     );
   }
 
-  Widget _buildBroadcastCard({
-    Key? key,
-    required Story story,
-    required int index,
-    required VoidCallback onTap,
-  }) {
-    return Container(
-      key: key,
-      margin: const EdgeInsets.only(bottom: 8),
-      child: Card(
-        elevation: 2,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        color: AppColors.backgroundCard,
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(12),
-          child: Container(
-            padding: const EdgeInsets.all(12),
-            child: Row(
-              children: [
-                // Live Indicator
-                Container(
-                  width: 12,
-                  height: 12,
-                  decoration: const BoxDecoration(
-                    color: Colors.green,
-                    shape: BoxShape.circle,
-                  ),
-                ),
-                const SizedBox(width: 12),
-
-                // Story Content
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        story.slug,
-                        style: AppTheme.bodyMedium,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      const SizedBox(height: 6),
-                      Text(
-                        'Ready for broadcast',
-                        style: AppTheme.bodySmall?.copyWith(
-                          color: Colors.green,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-
-                // Actions
-                IconButton(
-                  icon: const Icon(
-                    Icons.play_circle,
-                    color: Colors.green,
-                    size: 24,
-                  ),
-                  onPressed: () => _startBroadcast(story),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
   Color _getStatusColor(String status) {
     switch (status.toLowerCase()) {
       case 'ready':
@@ -613,16 +492,6 @@ class UserDashboard extends StatelessWidget {
           ),
         ],
       ),
-    );
-  }
-
-  void _startBroadcast(Story story) {
-    // Start broadcasting this script
-    Get.snackbar(
-      'Broadcast Started',
-      'Now broadcasting: ${story.slug}',
-      backgroundColor: Colors.green,
-      colorText: Colors.white,
     );
   }
 

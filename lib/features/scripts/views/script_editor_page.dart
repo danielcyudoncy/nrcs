@@ -25,6 +25,17 @@ class _ScriptEditorPageState extends State<ScriptEditorPage> {
   late TextEditingController _slugController;
   late StreamSubscription<StoryEvent> _subscription;
 
+  bool get canEdit =>
+      TokenProvider.isAdmin ||
+      TokenProvider.isEditor ||
+      TokenProvider.isProducer ||
+      (TokenProvider.isReporter &&
+          widget.story.updatedBy == TokenProvider.username);
+  bool get canApprove =>
+      TokenProvider.isEditor ||
+      TokenProvider.isProducer ||
+      TokenProvider.isAdmin;
+
   @override
   void initState() {
     super.initState();
@@ -76,29 +87,31 @@ class _ScriptEditorPageState extends State<ScriptEditorPage> {
       appBar: AppBar(
         title: const Text('Script Editor'),
         actions: [
-          TextButton(
-            onPressed: () {
-              ctrl.content.value = jsonEncode(
-                _quillController.document.toDelta().toJson(),
-              );
-              ctrl.save();
-              Get.back();
-            },
-            child: const Text('Save'),
-          ),
-          const SizedBox(width: 8),
-          TextButton(
-            onPressed: () {
-              ctrl.content.value = jsonEncode(
-                _quillController.document.toDelta().toJson(),
-              );
-              ctrl.submit();
-              Get.back();
-            },
-            child: const Text('Submit'),
-          ),
-          const SizedBox(width: 8),
-          if (TokenProvider.roles.contains('approver'))
+          if (canEdit)
+            TextButton(
+              onPressed: () {
+                ctrl.content.value = jsonEncode(
+                  _quillController.document.toDelta().toJson(),
+                );
+                ctrl.save();
+                Get.back();
+              },
+              child: const Text('Save'),
+            ),
+          if (canEdit) const SizedBox(width: 8),
+          if (canEdit)
+            TextButton(
+              onPressed: () {
+                ctrl.content.value = jsonEncode(
+                  _quillController.document.toDelta().toJson(),
+                );
+                ctrl.submit();
+                Get.back();
+              },
+              child: const Text('Submit'),
+            ),
+          if (canEdit) const SizedBox(width: 8),
+          if (canApprove)
             TextButton(
               onPressed: () {
                 ctrl.content.value = jsonEncode(
@@ -117,124 +130,133 @@ class _ScriptEditorPageState extends State<ScriptEditorPage> {
           children: [
             TextField(
               controller: _slugController,
+              readOnly: !canEdit,
               decoration: const InputDecoration(labelText: 'Slug'),
-              onChanged: (v) =>
-                  ctrl.story.value = ctrl.story.value!.copyWith(slug: v),
+              onChanged: canEdit
+                  ? (v) =>
+                        ctrl.story.value = ctrl.story.value!.copyWith(slug: v)
+                  : null,
             ),
             const SizedBox(height: 12),
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: [
-                  IconButton(
-                    onPressed: () =>
-                        _quillController.formatSelection(Attribute.bold),
-                    icon: Icon(Icons.format_bold),
-                    color:
-                        _quillController
-                                .getSelectionStyle()
-                                .attributes['bold'] !=
-                            null
-                        ? Colors.blue
-                        : null,
-                  ),
-                  IconButton(
-                    onPressed: () =>
-                        _quillController.formatSelection(Attribute.italic),
-                    icon: Icon(Icons.format_italic),
-                    color:
-                        _quillController
-                                .getSelectionStyle()
-                                .attributes['italic'] !=
-                            null
-                        ? Colors.blue
-                        : null,
-                  ),
-                  IconButton(
-                    onPressed: () =>
-                        _quillController.formatSelection(Attribute.underline),
-                    icon: Icon(Icons.format_underline),
-                    color:
-                        _quillController
-                                .getSelectionStyle()
-                                .attributes['underline'] !=
-                            null
-                        ? Colors.blue
-                        : null,
-                  ),
-                  IconButton(
-                    onPressed: () => _quillController.formatSelection(
-                      Attribute.strikeThrough,
+            if (canEdit)
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: [
+                    IconButton(
+                      onPressed: () =>
+                          _quillController.formatSelection(Attribute.bold),
+                      icon: Icon(Icons.format_bold),
+                      color:
+                          _quillController
+                                  .getSelectionStyle()
+                                  .attributes['bold'] !=
+                              null
+                          ? Colors.blue
+                          : null,
                     ),
-                    icon: Icon(Icons.strikethrough_s),
-                    color:
-                        _quillController
-                                .getSelectionStyle()
-                                .attributes['strike'] !=
-                            null
-                        ? Colors.blue
-                        : null,
-                  ),
-                  IconButton(
-                    onPressed: () =>
-                        _quillController.formatSelection(Attribute.ol),
-                    icon: Icon(Icons.list),
-                    color:
-                        _quillController.getSelectionStyle().attributes['ol'] !=
-                            null
-                        ? Colors.blue
-                        : null,
-                  ),
-                  IconButton(
-                    onPressed: () =>
-                        _quillController.formatSelection(Attribute.ul),
-                    icon: Icon(Icons.list_alt),
-                    color:
-                        _quillController.getSelectionStyle().attributes['ul'] !=
-                            null
-                        ? Colors.blue
-                        : null,
-                  ),
-                  IconButton(
-                    onPressed: () =>
-                        _quillController.formatSelection(Attribute.blockQuote),
-                    icon: Icon(Icons.format_quote),
-                    color:
-                        _quillController
-                                .getSelectionStyle()
-                                .attributes['blockquote'] !=
-                            null
-                        ? Colors.blue
-                        : null,
-                  ),
-                  IconButton(
-                    onPressed: () =>
-                        _quillController.formatSelection(Attribute.codeBlock),
-                    icon: Icon(Icons.code),
-                    color:
-                        _quillController
-                                .getSelectionStyle()
-                                .attributes['code-block'] !=
-                            null
-                        ? Colors.blue
-                        : null,
-                  ),
-                  IconButton(
-                    onPressed: () =>
-                        _quillController.formatSelection(Attribute.link),
-                    icon: Icon(Icons.link),
-                    color:
-                        _quillController
-                                .getSelectionStyle()
-                                .attributes['link'] !=
-                            null
-                        ? Colors.blue
-                        : null,
-                  ),
-                ],
+                    IconButton(
+                      onPressed: () =>
+                          _quillController.formatSelection(Attribute.italic),
+                      icon: Icon(Icons.format_italic),
+                      color:
+                          _quillController
+                                  .getSelectionStyle()
+                                  .attributes['italic'] !=
+                              null
+                          ? Colors.blue
+                          : null,
+                    ),
+                    IconButton(
+                      onPressed: () =>
+                          _quillController.formatSelection(Attribute.underline),
+                      icon: Icon(Icons.format_underline),
+                      color:
+                          _quillController
+                                  .getSelectionStyle()
+                                  .attributes['underline'] !=
+                              null
+                          ? Colors.blue
+                          : null,
+                    ),
+                    IconButton(
+                      onPressed: () => _quillController.formatSelection(
+                        Attribute.strikeThrough,
+                      ),
+                      icon: Icon(Icons.strikethrough_s),
+                      color:
+                          _quillController
+                                  .getSelectionStyle()
+                                  .attributes['strike'] !=
+                              null
+                          ? Colors.blue
+                          : null,
+                    ),
+                    IconButton(
+                      onPressed: () =>
+                          _quillController.formatSelection(Attribute.ol),
+                      icon: Icon(Icons.list),
+                      color:
+                          _quillController
+                                  .getSelectionStyle()
+                                  .attributes['ol'] !=
+                              null
+                          ? Colors.blue
+                          : null,
+                    ),
+                    IconButton(
+                      onPressed: () =>
+                          _quillController.formatSelection(Attribute.ul),
+                      icon: Icon(Icons.list_alt),
+                      color:
+                          _quillController
+                                  .getSelectionStyle()
+                                  .attributes['ul'] !=
+                              null
+                          ? Colors.blue
+                          : null,
+                    ),
+                    IconButton(
+                      onPressed: () => _quillController.formatSelection(
+                        Attribute.blockQuote,
+                      ),
+                      icon: Icon(Icons.format_quote),
+                      color:
+                          _quillController
+                                  .getSelectionStyle()
+                                  .attributes['blockquote'] !=
+                              null
+                          ? Colors.blue
+                          : null,
+                    ),
+                    IconButton(
+                      onPressed: () =>
+                          _quillController.formatSelection(Attribute.codeBlock),
+                      icon: Icon(Icons.code),
+                      color:
+                          _quillController
+                                  .getSelectionStyle()
+                                  .attributes['code-block'] !=
+                              null
+                          ? Colors.blue
+                          : null,
+                    ),
+                    IconButton(
+                      onPressed: () =>
+                          _quillController.formatSelection(Attribute.link),
+                      icon: Icon(Icons.link),
+                      color:
+                          _quillController
+                                  .getSelectionStyle()
+                                  .attributes['link'] !=
+                              null
+                          ? Colors.blue
+                          : null,
+                    ),
+                  ],
+                ),
               ),
-            ),
-            const SizedBox(height: 12),
+            if (canEdit) const SizedBox(height: 12),
             Expanded(
               child: QuillEditor(
                 controller: _quillController,

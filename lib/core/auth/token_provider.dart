@@ -5,8 +5,11 @@ class TokenProvider {
   static List<String> roles = [];
   static UserRole? currentRole;
 
-  static bool get isWriter => currentRole == UserRole.writer;
-  static bool get isCaster => currentRole == UserRole.caster;
+  static bool get isReporter => currentRole == UserRole.reporter;
+  static bool get isEditor => currentRole == UserRole.editor;
+  static bool get isProducer => currentRole == UserRole.producer;
+  static bool get isAnchor => currentRole == UserRole.anchor;
+  static bool get isAdmin => currentRole == UserRole.admin;
 
   static void setUser(String token, String username, List<String> roles) {
     TokenProvider.token = token;
@@ -23,15 +26,17 @@ class TokenProvider {
   }
 
   static UserRole _determinePrimaryRole(List<String> roles) {
-    // Priority: writer > caster > other roles
-    if (roles.contains('writer')) return UserRole.writer;
-    if (roles.contains('caster')) return UserRole.caster;
+    // Priority: admin > producer > editor > reporter > anchor
     if (roles.contains('admin')) return UserRole.admin;
-    return UserRole.writer; // Default to writer role
+    if (roles.contains('producer')) return UserRole.producer;
+    if (roles.contains('editor')) return UserRole.editor;
+    if (roles.contains('reporter')) return UserRole.reporter;
+    if (roles.contains('anchor')) return UserRole.anchor;
+    return UserRole.reporter; // Default to reporter role
   }
 }
 
-enum UserRole { writer, caster, admin }
+enum UserRole { reporter, editor, producer, anchor, admin }
 
 class User {
   final String username;

@@ -7,6 +7,7 @@ import 'package:get/get.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/validations.dart';
 import '../../core/auth/auth_controller.dart';
+import '../../core/auth/token_provider.dart';
 
 class CreateAccountPage extends StatefulWidget {
   const CreateAccountPage({super.key});
@@ -25,6 +26,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
   bool _agreeToTerms = false;
   bool _obscureText = true;
   bool _confirmObscureText = true;
+  String _selectedRole = 'reporter';
 
   void _create() async {
     if (_formKey.currentState!.validate()) {
@@ -39,6 +41,8 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
 
       try {
         await _authController.signUp(_user.text.trim(), _pass.text);
+        // Mock setting user with role
+        TokenProvider.setUser('mock_token', _user.text.trim(), [_selectedRole]);
         Get.offNamed('/rundown');
       } catch (e) {
         if (mounted) {
@@ -261,6 +265,45 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                           color: Colors.red,
                         ),
                       ),
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Role selection
+                    DropdownButtonFormField<String>(
+                      initialValue: _selectedRole,
+                      dropdownColor: AppColors.backgroundCard,
+                      decoration: InputDecoration(
+                        labelText: 'Role',
+                        filled: true,
+                        fillColor: AppColors.glassWhite10,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(8)),
+                        ),
+                      ),
+                      items: const [
+                        DropdownMenuItem(
+                          value: 'reporter',
+                          child: Text('Reporter'),
+                        ),
+                        DropdownMenuItem(
+                          value: 'editor',
+                          child: Text('Editor'),
+                        ),
+                        DropdownMenuItem(
+                          value: 'producer',
+                          child: Text('Producer'),
+                        ),
+                        DropdownMenuItem(
+                          value: 'anchor',
+                          child: Text('Anchor'),
+                        ),
+                        DropdownMenuItem(value: 'admin', child: Text('Admin')),
+                      ],
+                      onChanged: (value) {
+                        setState(() {
+                          _selectedRole = value!;
+                        });
+                      },
                     ),
                     const SizedBox(height: 8),
 

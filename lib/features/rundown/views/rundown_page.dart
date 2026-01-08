@@ -1,6 +1,7 @@
 // features/rundown/views/rundown_page.dart
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:nrcs/core/auth/token_provider.dart';
 import 'package:nrcs/core/services/story_service.dart';
 import 'package:nrcs/core/models/story.dart';
 import 'package:nrcs/core/theme/app_theme.dart';
@@ -79,13 +80,17 @@ class RundownPage extends StatelessWidget {
               ],
             ),
           ),
-          IconButton(
-            icon: Icon(
-              Icons.add,
-              color: Theme.of(context).appBarTheme.foregroundColor,
+          if (TokenProvider.isReporter ||
+              TokenProvider.isEditor ||
+              TokenProvider.isProducer ||
+              TokenProvider.isAdmin)
+            IconButton(
+              icon: Icon(
+                Icons.add,
+                color: Theme.of(context).appBarTheme.foregroundColor,
+              ),
+              onPressed: () => Get.toNamed('/create-story'),
             ),
-            onPressed: () => Get.toNamed('/create-story'),
-          ),
           PopupMenuButton<String>(
             icon: Icon(
               Icons.more_vert,
@@ -182,12 +187,27 @@ class RundownPage extends StatelessWidget {
                       margin: const EdgeInsets.symmetric(horizontal: 12),
                       child: stories.isEmpty
                           ? _buildEmptyState(context)
-                          : ReorderableListView.builder(
+                          : (TokenProvider.isProducer || TokenProvider.isAdmin)
+                          ? ReorderableListView.builder(
                               itemCount: stories.length,
                               onReorder: (oldIndex, newIndex) {
                                 if (newIndex > oldIndex) newIndex -= 1;
                                 svc.reorder(oldIndex, newIndex);
                               },
+                              itemBuilder: (context, i) {
+                                final s = stories[i];
+                                return _buildStoryCard(
+                                  key: ValueKey(s.id),
+                                  context: context,
+                                  story: s,
+                                  index: i,
+                                  onTap: () =>
+                                      Get.to(() => ScriptEditorPage(story: s)),
+                                );
+                              },
+                            )
+                          : ListView.builder(
+                              itemCount: stories.length,
                               itemBuilder: (context, i) {
                                 final s = stories[i];
                                 return _buildStoryCard(

@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'dart:convert';
+import 'dart:async';
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:nrcs/features/scripts/controllers/script_controller.dart';
 import 'package:nrcs/core/services/story_service.dart';
@@ -21,6 +22,8 @@ class _ScriptEditorPageState extends State<ScriptEditorPage> {
   late QuillController _quillController;
   late FocusNode _focusNode;
   late ScrollController _scrollController;
+  late TextEditingController _slugController;
+  late StreamSubscription<StoryEvent> _subscription;
 
   @override
   void initState() {
@@ -31,6 +34,7 @@ class _ScriptEditorPageState extends State<ScriptEditorPage> {
     _quillController = QuillController.basic();
     _focusNode = FocusNode();
     _scrollController = ScrollController();
+    _slugController = TextEditingController(text: widget.story.slug);
     _quillController.addListener(() => setState(() {}));
     try {
       final delta = jsonDecode(ctrl.content.value) as List;
@@ -39,11 +43,12 @@ class _ScriptEditorPageState extends State<ScriptEditorPage> {
       _quillController.document.insert(0, ctrl.content.value);
     }
     // listen for remote updates to this story
-    svc.stream.listen((ev) {
+    _subscription = svc.stream.listen((ev) {
       if (ev.story != null && ev.story!.id == widget.story.id) {
         // update local
         ctrl.story.value = ev.story;
         ctrl.content.value = ev.story!.script;
+        _slugController.text = ev.story!.slug;
         try {
           final delta = jsonDecode(ev.story!.script) as List;
           _quillController.document = Document.fromJson(delta);
@@ -60,6 +65,8 @@ class _ScriptEditorPageState extends State<ScriptEditorPage> {
     _quillController.dispose();
     _focusNode.dispose();
     _scrollController.dispose();
+    _slugController.dispose();
+    _subscription.cancel();
     super.dispose();
   }
 
@@ -109,7 +116,7 @@ class _ScriptEditorPageState extends State<ScriptEditorPage> {
         child: Column(
           children: [
             TextField(
-              controller: TextEditingController(text: widget.story.slug),
+              controller: _slugController,
               decoration: const InputDecoration(labelText: 'Slug'),
               onChanged: (v) =>
                   ctrl.story.value = ctrl.story.value!.copyWith(slug: v),
@@ -125,9 +132,9 @@ class _ScriptEditorPageState extends State<ScriptEditorPage> {
                     icon: Icon(Icons.format_bold),
                     color:
                         _quillController
-                            .getSelectionStyle()
-                            .attributes
-                            .containsKey(Attribute.bold)
+                                .getSelectionStyle()
+                                .attributes['bold'] !=
+                            null
                         ? Colors.blue
                         : null,
                   ),
@@ -137,9 +144,9 @@ class _ScriptEditorPageState extends State<ScriptEditorPage> {
                     icon: Icon(Icons.format_italic),
                     color:
                         _quillController
-                            .getSelectionStyle()
-                            .attributes
-                            .containsKey(Attribute.italic)
+                                .getSelectionStyle()
+                                .attributes['italic'] !=
+                            null
                         ? Colors.blue
                         : null,
                   ),
@@ -149,9 +156,9 @@ class _ScriptEditorPageState extends State<ScriptEditorPage> {
                     icon: Icon(Icons.format_underline),
                     color:
                         _quillController
-                            .getSelectionStyle()
-                            .attributes
-                            .containsKey(Attribute.underline)
+                                .getSelectionStyle()
+                                .attributes['underline'] !=
+                            null
                         ? Colors.blue
                         : null,
                   ),
@@ -162,9 +169,9 @@ class _ScriptEditorPageState extends State<ScriptEditorPage> {
                     icon: Icon(Icons.strikethrough_s),
                     color:
                         _quillController
-                            .getSelectionStyle()
-                            .attributes
-                            .containsKey(Attribute.strikeThrough)
+                                .getSelectionStyle()
+                                .attributes['strike'] !=
+                            null
                         ? Colors.blue
                         : null,
                   ),
@@ -173,10 +180,8 @@ class _ScriptEditorPageState extends State<ScriptEditorPage> {
                         _quillController.formatSelection(Attribute.ol),
                     icon: Icon(Icons.list),
                     color:
-                        _quillController
-                            .getSelectionStyle()
-                            .attributes
-                            .containsKey(Attribute.ol)
+                        _quillController.getSelectionStyle().attributes['ol'] !=
+                            null
                         ? Colors.blue
                         : null,
                   ),
@@ -185,10 +190,8 @@ class _ScriptEditorPageState extends State<ScriptEditorPage> {
                         _quillController.formatSelection(Attribute.ul),
                     icon: Icon(Icons.list_alt),
                     color:
-                        _quillController
-                            .getSelectionStyle()
-                            .attributes
-                            .containsKey(Attribute.ul)
+                        _quillController.getSelectionStyle().attributes['ul'] !=
+                            null
                         ? Colors.blue
                         : null,
                   ),
@@ -198,9 +201,9 @@ class _ScriptEditorPageState extends State<ScriptEditorPage> {
                     icon: Icon(Icons.format_quote),
                     color:
                         _quillController
-                            .getSelectionStyle()
-                            .attributes
-                            .containsKey(Attribute.blockQuote)
+                                .getSelectionStyle()
+                                .attributes['blockquote'] !=
+                            null
                         ? Colors.blue
                         : null,
                   ),
@@ -210,9 +213,9 @@ class _ScriptEditorPageState extends State<ScriptEditorPage> {
                     icon: Icon(Icons.code),
                     color:
                         _quillController
-                            .getSelectionStyle()
-                            .attributes
-                            .containsKey(Attribute.codeBlock)
+                                .getSelectionStyle()
+                                .attributes['code-block'] !=
+                            null
                         ? Colors.blue
                         : null,
                   ),
@@ -222,9 +225,9 @@ class _ScriptEditorPageState extends State<ScriptEditorPage> {
                     icon: Icon(Icons.link),
                     color:
                         _quillController
-                            .getSelectionStyle()
-                            .attributes
-                            .containsKey(Attribute.link)
+                                .getSelectionStyle()
+                                .attributes['link'] !=
+                            null
                         ? Colors.blue
                         : null,
                   ),

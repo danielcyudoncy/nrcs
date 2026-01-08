@@ -498,7 +498,7 @@ class UserDashboard extends StatelessWidget {
   void _handleMenuAction(String action, BuildContext context) {
     switch (action) {
       case 'profile':
-        _showProfileDialog(context);
+        Get.toNamed('/profile');
         break;
       case 'settings':
         _showSettingsDialog(context);
@@ -508,38 +508,6 @@ class UserDashboard extends StatelessWidget {
         svc.loadDemoData();
         break;
     }
-  }
-
-  void _showProfileDialog(BuildContext context) {
-    Get.dialog(
-      AlertDialog(
-        backgroundColor: AppColors.backgroundCard,
-        title: Text('User Profile', style: AppTheme.bodyLarge),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Username: ${TokenProvider.username}',
-              style: AppTheme.bodyMedium,
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Role: ${TokenProvider.currentRole?.name ?? "Unknown"}',
-              style: AppTheme.bodyMedium,
-            ),
-            const SizedBox(height: 8),
-            Text('Permissions:', style: AppTheme.bodyMedium),
-            ...TokenProvider.roles.map(
-              (role) => Text('• $role', style: AppTheme.bodySmall),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(onPressed: () => Get.back(), child: const Text('Close')),
-        ],
-      ),
-    );
   }
 
   void _showSettingsDialog(BuildContext context) {

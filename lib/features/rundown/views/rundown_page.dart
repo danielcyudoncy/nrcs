@@ -111,6 +111,13 @@ class RundownPage extends StatelessWidget {
             },
             itemBuilder: (BuildContext context) => [
               PopupMenuItem(
+                value: 'profile',
+                child: ListTile(
+                  leading: const Icon(Icons.person),
+                  title: Text('Profile', style: AppTheme.bodyMedium),
+                ),
+              ),
+              PopupMenuItem(
                 value: 'settings',
                 child: ListTile(
                   leading: const Icon(Icons.settings),

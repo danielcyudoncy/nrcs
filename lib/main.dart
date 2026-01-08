@@ -12,6 +12,7 @@ import 'features/landing/splash_page.dart';
 import 'features/landing/landing_page.dart';
 import 'features/auth/create_account_page.dart';
 import 'features/dashboard/user_dashboard.dart';
+import 'features/profile/views/profile_page.dart';
 import 'core/services/story_service.dart';
 import 'core/auth/auth_controller.dart';
 import 'core/utils/responsive_utils.dart';
@@ -70,6 +71,7 @@ class _NRCSAppState extends State<NRCSApp> {
                 name: '/create-account',
                 page: () => const CreateAccountPage(),
               ),
+              GetPage(name: '/profile', page: () => const ProfilePage()),
             ],
           ),
         );

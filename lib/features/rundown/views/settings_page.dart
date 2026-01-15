@@ -153,7 +153,7 @@ class SettingsPage extends StatelessWidget {
                           Icons.chevron_right,
                           color: Theme.of(context).iconTheme.color,
                         ),
-                        onTap: () {},
+                        onTap: () => Get.toNamed('/profile'),
                       ),
                     ],
                   ),

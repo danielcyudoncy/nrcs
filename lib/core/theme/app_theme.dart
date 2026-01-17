@@ -79,7 +79,7 @@ class AppTheme {
       filled: true,
       fillColor: AppColors.glassWhite10,
       labelStyle: ResponsiveTextTheme.textTheme.bodyMedium?.copyWith(
-        color: AppColors.textSecondary,
+        color: AppColors.textPrimary,
       ),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(8.r),
@@ -140,7 +140,7 @@ class AppTheme {
       filled: true,
       fillColor: Colors.grey[800],
       labelStyle: ResponsiveTextTheme.textTheme.bodyMedium?.copyWith(
-        color: Colors.white70,
+        color: Colors.white,
       ),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(8.r),

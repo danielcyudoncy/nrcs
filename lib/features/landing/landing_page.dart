@@ -112,7 +112,7 @@ class LandingPage extends StatelessWidget {
 
   Widget _buildFeatureCard(BuildContext context, BoxConstraints constraints) {
     final double maxWidth = constraints.maxWidth;
-    final double cardWidth = maxWidth < 480 ? maxWidth * 0.9 : 420;
+    final double cardWidth = maxWidth < 580 ? maxWidth * 0.9 : 420;
     final double cardHeight = maxWidth < 420 ? maxWidth * 0.75 : 340;
 
     return Card(

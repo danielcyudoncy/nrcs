@@ -80,10 +80,7 @@ class RundownPage extends StatelessWidget {
               ],
             ),
           ),
-          if (TokenProvider.isReporter ||
-              TokenProvider.isEditor ||
-              TokenProvider.isProducer ||
-              TokenProvider.isAdmin)
+          if (!TokenProvider.isAnchor)
             IconButton(
               icon: Icon(
                 Icons.add,
@@ -194,7 +191,9 @@ class RundownPage extends StatelessWidget {
                       margin: const EdgeInsets.symmetric(horizontal: 12),
                       child: stories.isEmpty
                           ? _buildEmptyState(context)
-                          : (TokenProvider.isProducer || TokenProvider.isAdmin)
+                          : (TokenProvider.isEditor ||
+                                TokenProvider.isProducer ||
+                                TokenProvider.isAdmin)
                           ? ReorderableListView.builder(
                               itemCount: stories.length,
                               onReorder: (oldIndex, newIndex) {

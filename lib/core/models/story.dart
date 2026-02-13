@@ -8,6 +8,7 @@ class Story {
   final int version;
   final String? assignedTo;
   final String? notes;
+  final String priority; // low, medium, high, urgent
   final double prompterSpeed; // 1.0 is default
   final String? updatedBy;
 
@@ -21,6 +22,7 @@ class Story {
     this.updatedBy,
     this.assignedTo,
     this.notes,
+    this.priority = 'medium',
     this.prompterSpeed = 1.0,
   });
 
@@ -34,6 +36,7 @@ class Story {
     updatedBy: m['updatedBy'] as String?,
     assignedTo: m['assignedTo'] as String?,
     notes: m['notes'] as String?,
+    priority: (m['priority'] ?? 'medium') as String,
     prompterSpeed: (m['prompterSpeed'] ?? 1.0) as double,
   );
 
@@ -47,6 +50,7 @@ class Story {
     'updatedBy': updatedBy,
     'assignedTo': assignedTo,
     'notes': notes,
+    'priority': priority,
     'prompterSpeed': prompterSpeed,
   };
 
@@ -59,6 +63,7 @@ class Story {
     String? updatedBy,
     String? assignedTo,
     String? notes,
+    String? priority,
     double? prompterSpeed,
   }) => Story(
     id: id,
@@ -70,6 +75,7 @@ class Story {
     updatedBy: updatedBy ?? this.updatedBy,
     assignedTo: assignedTo ?? this.assignedTo,
     notes: notes ?? this.notes,
+    priority: priority ?? this.priority,
     prompterSpeed: prompterSpeed ?? this.prompterSpeed,
   );
 }

@@ -30,6 +30,7 @@ class StoryService {
   }
 
   void _loadDemoDataInternal() {
+    final priorities = ['low', 'medium', 'high', 'urgent'];
     for (var i = 0; i < 8; i++) {
       _items.add(
         Story(
@@ -39,6 +40,7 @@ class StoryService {
           status: 'draft',
           assignedTo: i % 2 == 0 ? null : 'Reporter ${i + 1}',
           notes: i % 3 == 0 ? 'Urgent update needed' : null,
+          priority: priorities[i % priorities.length],
         ),
       );
     }
@@ -50,17 +52,9 @@ class StoryService {
 
   Story save(Story s, {required String user}) {
     final idx = _items.indexWhere((it) => it.id == s.id);
-    final updated = Story(
-      id: s.id,
-      slug: s.slug,
-      orderNo: s.orderNo,
-      status: s.status,
-      script: s.script,
+    final updated = s.copyWith(
       version: s.version + 1,
       updatedBy: user,
-      assignedTo: s.assignedTo,
-      notes: s.notes,
-      prompterSpeed: s.prompterSpeed,
     );
     if (idx == -1) {
       _items.add(updated);
@@ -75,7 +69,17 @@ class StoryService {
     final idx = _items.indexWhere((it) => it.id == id);
     if (idx == -1) throw Exception('not found');
     final s = _items[idx];
-    final updated = s.copyWith(notes: notes, updatedBy: user);
+    final updated = s.copyWith(notes: notes, updatedBy: user, version: s.version + 1);
+    _items[idx] = updated;
+    _ctrl.add(StoryEvent(type: StoryEventType.upsert, story: updated));
+    return updated;
+  }
+
+  Story updatePriority(String id, String priority, {required String user}) {
+    final idx = _items.indexWhere((it) => it.id == id);
+    if (idx == -1) throw Exception('not found');
+    final s = _items[idx];
+    final updated = s.copyWith(priority: priority, updatedBy: user, version: s.version + 1);
     _items[idx] = updated;
     _ctrl.add(StoryEvent(type: StoryEventType.upsert, story: updated));
     return updated;
@@ -85,7 +89,7 @@ class StoryService {
     final idx = _items.indexWhere((it) => it.id == id);
     if (idx == -1) throw Exception('not found');
     final s = _items[idx];
-    final updated = s.copyWith(assignedTo: assignee, updatedBy: user);
+    final updated = s.copyWith(assignedTo: assignee, updatedBy: user, version: s.version + 1);
     _items[idx] = updated;
     _ctrl.add(StoryEvent(type: StoryEventType.upsert, story: updated));
     return updated;
@@ -95,45 +99,20 @@ class StoryService {
     final idx = _items.indexWhere((it) => it.id == id);
     if (idx == -1) throw Exception('not found');
     final s = _items[idx];
-    final updated = s.copyWith(status: 'submitted');
-    // bump version and updatedBy
-    final newS = Story(
-      id: updated.id,
-      slug: updated.slug,
-      orderNo: updated.orderNo,
-      status: updated.status,
-      script: s.script,
-      version: s.version + 1,
-      updatedBy: user,
-      assignedTo: s.assignedTo,
-      notes: s.notes,
-      prompterSpeed: s.prompterSpeed,
-    );
-    _items[idx] = newS;
-    _ctrl.add(StoryEvent(type: StoryEventType.submit, story: newS));
-    return newS;
+    final updated = s.copyWith(status: 'submitted', updatedBy: user, version: s.version + 1);
+    _items[idx] = updated;
+    _ctrl.add(StoryEvent(type: StoryEventType.submit, story: updated));
+    return updated;
   }
 
   Story approve(String id, {required String user}) {
     final idx = _items.indexWhere((it) => it.id == id);
     if (idx == -1) throw Exception('not found');
     final s = _items[idx];
-    final updated = s.copyWith(status: 'approved');
-    final newS = Story(
-      id: updated.id,
-      slug: updated.slug,
-      orderNo: updated.orderNo,
-      status: updated.status,
-      script: s.script,
-      version: s.version + 1,
-      updatedBy: user,
-      assignedTo: s.assignedTo,
-      notes: s.notes,
-      prompterSpeed: s.prompterSpeed,
-    );
-    _items[idx] = newS;
-    _ctrl.add(StoryEvent(type: StoryEventType.approve, story: newS));
-    return newS;
+    final updated = s.copyWith(status: 'approved', updatedBy: user, version: s.version + 1);
+    _items[idx] = updated;
+    _ctrl.add(StoryEvent(type: StoryEventType.approve, story: updated));
+    return updated;
   }
 
   void delete(String id) {

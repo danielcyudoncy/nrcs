@@ -78,6 +78,7 @@ class _ScriptEditorPageState extends State<ScriptEditorPage> {
           if (mounted) {
             _quillController.document = newDoc;
             _slugController.text = ev.story!.slug;
+            _quillController.readOnly = !canEdit;
             setState(() {});
           }
         });
@@ -91,6 +92,8 @@ class _ScriptEditorPageState extends State<ScriptEditorPage> {
         ctrl.story.value = s.copyWith(slug: _slugController.text);
       }
     });
+
+    _quillController.readOnly = !canEdit;
   }
 
   Document _parseDocument(String content) {
@@ -130,7 +133,7 @@ class _ScriptEditorPageState extends State<ScriptEditorPage> {
   Widget build(BuildContext context) {
     return PopScope(
       canPop: !_dirty,
-      onPopInvoked: (didPop) async {
+      onPopInvokedWithResult: (didPop, result) async {
         if (didPop || !_dirty) return;
 
         final shouldLeave =
@@ -304,9 +307,8 @@ class _ScriptEditorPageState extends State<ScriptEditorPage> {
                   ),
                   child: QuillEditor.basic(
                     controller: _quillController,
-                    config: QuillEditorConfig(
-                      readOnly: !canEdit,
-                    ),
+                    focusNode: FocusNode(),
+                    scrollController: ScrollController(),
                   ),
                 ),
               ),

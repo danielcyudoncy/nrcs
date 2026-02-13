@@ -587,7 +587,7 @@ class _AssignmentsPageState extends State<AssignmentsPage> with SingleTickerProv
                 SizedBox(height: 16.h),
                 DropdownButtonFormField<String>(
                   dropdownColor: AppColors.backgroundCard,
-                  value: selectedReporter,
+                  initialValue: selectedReporter,
                   decoration: const InputDecoration(labelText: 'Assign To (optional)'),
                   items: _reporters.map((r) => DropdownMenuItem(
                     value: r,
@@ -598,7 +598,7 @@ class _AssignmentsPageState extends State<AssignmentsPage> with SingleTickerProv
                 SizedBox(height: 16.h),
                 DropdownButtonFormField<String>(
                   dropdownColor: AppColors.backgroundCard,
-                  value: selectedPriority,
+                  initialValue: selectedPriority,
                   decoration: const InputDecoration(labelText: 'Priority'),
                   items: ['low', 'medium', 'high', 'urgent'].map((p) => DropdownMenuItem(
                     value: p,

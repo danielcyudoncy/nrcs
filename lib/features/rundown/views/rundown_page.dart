@@ -9,6 +9,9 @@ import 'package:nrcs/core/utils/responsive_utils.dart';
 import 'package:nrcs/features/rundown/views/settings_page.dart';
 import 'package:nrcs/features/scripts/views/script_editor_page.dart';
 
+import 'package:nrcs/features/planning/views/assignment_page.dart';
+import 'package:nrcs/features/prompter/views/teleprompter_page.dart';
+
 class RundownPage extends StatelessWidget {
   const RundownPage({super.key});
 
@@ -53,6 +56,12 @@ class RundownPage extends StatelessWidget {
           ],
         ),
         actions: [
+          IconButton(
+             padding: EdgeInsets.zero,
+             icon: const Icon(Icons.assignment_ind, color: Colors.blue),
+             tooltip: 'Planning & Assignments',
+             onPressed: () => Get.to(() => const AssignmentsPage()),
+          ),
           Container(
             margin: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
@@ -395,74 +404,56 @@ class RundownPage extends StatelessWidget {
                               color: statusColor,
                             ),
                           ),
-                          if (story.updatedBy != null) ...[
+                          if (story.assignedTo != null) ...[
                             const SizedBox(width: 8),
-                            Container(
-                              width: 3,
-                              height: 3,
-                              decoration: const BoxDecoration(
-                                color: Colors.white54,
-                                shape: BoxShape.circle,
-                              ),
-                            ),
-                            const SizedBox(width: 3),
-                            Text(
-                              'by ${story.updatedBy}',
-                              style: AppTheme.bodySmall?.copyWith(
-                                color: Theme.of(
-                                  context,
-                                ).textTheme.bodySmall?.color,
-                              ),
-                            ),
+                             Icon(Icons.person, size: 12, color: Theme.of(context).textTheme.bodySmall?.color),
+                             const SizedBox(width: 2),
+                             Text(
+                                story.assignedTo!,
+                                style: AppTheme.bodySmall,
+                             ),
                           ],
                         ],
                       ),
+                      if (story.notes != null) ...[
+                          const SizedBox(height: 4),
+                          Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                              decoration: BoxDecoration(
+                                  color: Colors.yellow.withAlpha(50),
+                                  borderRadius: BorderRadius.circular(4),
+                              ),
+                              child: Text(
+                                  'Note: ${story.notes}',
+                                  style: AppTheme.bodySmall?.copyWith(fontSize: 10, color: Colors.orange),
+                                  maxLines: 1, 
+                                  overflow: TextOverflow.ellipsis,
+                              ),
+                          )
+                      ]
                     ],
                   ),
                 ),
 
-                // Status Badge & Actions
-                Column(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 6,
-                      ),
-                      decoration: BoxDecoration(
-                        color: statusColor.withAlpha((0.2 * 255).round()),
-                        borderRadius: BorderRadius.circular(20),
-                        border: Border.all(color: statusColor, width: 1),
-                      ),
-                      child: Text(
-                        story.status.toUpperCase(),
-                        style: AppTheme.bodySmall?.copyWith(color: statusColor),
-                      ),
-                    ),
-                    const SizedBox(height: 6),
-                    Row(
+                // Actions
+                Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
+                        IconButton(
+                             icon: const Icon(Icons.tv, color: Colors.green),
+                             tooltip: 'Open Teleprompter',
+                             onPressed: () => Get.to(() => TeleprompterPage(story: story)),
+                        ),
                         IconButton(
                           icon: const Icon(
                             Icons.edit,
                             color: Colors.white54,
-                            size: 16,
+                            size: 18,
                           ),
                           onPressed: onTap,
                         ),
-                        IconButton(
-                          icon: const Icon(
-                            Icons.more_horiz,
-                            color: Colors.white54,
-                            size: 16,
-                          ),
-                          onPressed: () {},
-                        ),
                       ],
                     ),
-                  ],
-                ),
               ],
             ),
           ),

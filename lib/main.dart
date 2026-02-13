@@ -4,6 +4,8 @@ import 'package:get/get.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_quill/flutter_quill.dart';
 import 'core/env.dart';
 import 'features/rundown/views/rundown_page.dart';
 import 'features/rundown/views/story_create_page.dart';
@@ -55,6 +57,12 @@ class _NRCSAppState extends State<NRCSApp> {
             debugShowCheckedModeBanner: false,
             title: 'NRCS',
             theme: themeCtrl.currentTheme,
+            localizationsDelegates: const [
+              GlobalMaterialLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              FlutterQuillLocalizations.delegate,
+            ],
             initialRoute: '/splash',
             getPages: [
               GetPage(name: '/', page: () => const RundownPage()),

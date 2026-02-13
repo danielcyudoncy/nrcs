@@ -37,6 +37,8 @@ class StoryService {
           slug: 'Story ${i + 1}',
           orderNo: i + 1,
           status: 'draft',
+          assignedTo: i % 2 == 0 ? null : 'Reporter ${i + 1}',
+          notes: i % 3 == 0 ? 'Urgent update needed' : null,
         ),
       );
     }
@@ -56,12 +58,35 @@ class StoryService {
       script: s.script,
       version: s.version + 1,
       updatedBy: user,
+      assignedTo: s.assignedTo,
+      notes: s.notes,
+      prompterSpeed: s.prompterSpeed,
     );
     if (idx == -1) {
       _items.add(updated);
     } else {
       _items[idx] = updated;
     }
+    _ctrl.add(StoryEvent(type: StoryEventType.upsert, story: updated));
+    return updated;
+  }
+
+  Story updateNotes(String id, String notes, {required String user}) {
+    final idx = _items.indexWhere((it) => it.id == id);
+    if (idx == -1) throw Exception('not found');
+    final s = _items[idx];
+    final updated = s.copyWith(notes: notes, updatedBy: user);
+    _items[idx] = updated;
+    _ctrl.add(StoryEvent(type: StoryEventType.upsert, story: updated));
+    return updated;
+  }
+
+  Story assign(String id, String? assignee, {required String user}) {
+    final idx = _items.indexWhere((it) => it.id == id);
+    if (idx == -1) throw Exception('not found');
+    final s = _items[idx];
+    final updated = s.copyWith(assignedTo: assignee, updatedBy: user);
+    _items[idx] = updated;
     _ctrl.add(StoryEvent(type: StoryEventType.upsert, story: updated));
     return updated;
   }
@@ -80,6 +105,9 @@ class StoryService {
       script: s.script,
       version: s.version + 1,
       updatedBy: user,
+      assignedTo: s.assignedTo,
+      notes: s.notes,
+      prompterSpeed: s.prompterSpeed,
     );
     _items[idx] = newS;
     _ctrl.add(StoryEvent(type: StoryEventType.submit, story: newS));
@@ -99,6 +127,9 @@ class StoryService {
       script: s.script,
       version: s.version + 1,
       updatedBy: user,
+      assignedTo: s.assignedTo,
+      notes: s.notes,
+      prompterSpeed: s.prompterSpeed,
     );
     _items[idx] = newS;
     _ctrl.add(StoryEvent(type: StoryEventType.approve, story: newS));
@@ -123,15 +154,7 @@ class StoryService {
     _items.insert(toIndex, item);
     // fix orderNo
     for (var i = 0; i < _items.length; i++) {
-      _items[i] = Story(
-        id: _items[i].id,
-        slug: _items[i].slug,
-        orderNo: i + 1,
-        status: _items[i].status,
-        script: _items[i].script,
-        version: _items[i].version,
-        updatedBy: _items[i].updatedBy,
-      );
+      _items[i] = _items[i].copyWith(orderNo: i + 1);
     }
     _ctrl.add(
       StoryEvent(type: StoryEventType.reorder, list: List.unmodifiable(_items)),

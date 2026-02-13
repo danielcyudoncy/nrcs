@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'dart:convert';
 import 'dart:async';
 import 'package:flutter_quill/flutter_quill.dart';
+
 import 'package:nrcs/features/scripts/controllers/script_controller.dart';
 import 'package:nrcs/core/services/story_service.dart';
 import 'package:nrcs/core/models/story.dart';
@@ -20,10 +21,13 @@ class ScriptEditorPage extends StatefulWidget {
 class _ScriptEditorPageState extends State<ScriptEditorPage> {
   late ScriptController ctrl;
   late QuillController _quillController;
-  late FocusNode _focusNode;
-  late ScrollController _scrollController;
   late TextEditingController _slugController;
-  late StreamSubscription<StoryEvent> _subscription;
+
+  StreamSubscription? _storySub;
+  bool _dirty = false;
+  bool _saving = false;
+  bool _submitting = false;
+  bool _approving = false;
 
   bool get canEdit =>
       TokenProvider.isAdmin ||
@@ -31,6 +35,7 @@ class _ScriptEditorPageState extends State<ScriptEditorPage> {
       TokenProvider.isProducer ||
       (TokenProvider.isReporter &&
           widget.story.updatedBy == TokenProvider.username);
+
   bool get canApprove =>
       TokenProvider.isEditor ||
       TokenProvider.isProducer ||
@@ -40,231 +45,273 @@ class _ScriptEditorPageState extends State<ScriptEditorPage> {
   void initState() {
     super.initState();
     final svc = Get.find<StoryService>();
-    ctrl = Get.put(ScriptController(service: svc));
+    ctrl = Get.isRegistered<ScriptController>()
+        ? Get.find<ScriptController>()
+        : Get.put(ScriptController(service: svc));
     ctrl.load(widget.story);
-    _quillController = QuillController.basic();
-    _focusNode = FocusNode();
-    _scrollController = ScrollController();
     _slugController = TextEditingController(text: widget.story.slug);
-    _quillController.addListener(() => setState(() {}));
-    try {
-      final delta = jsonDecode(ctrl.content.value) as List;
-      _quillController.document = Document.fromJson(delta);
-    } catch (e) {
-      _quillController.document.insert(0, ctrl.content.value);
-    }
-    // listen for remote updates to this story
-    _subscription = svc.stream.listen((ev) {
+
+    final initialDoc = _parseDocument(ctrl.content.value);
+    _quillController = QuillController(
+      document: initialDoc,
+      selection: const TextSelection.collapsed(offset: 0),
+    );
+
+    // Track local edits
+    _quillController.document.changes.listen((_) {
+      if (mounted) {
+        setState(() {
+          _dirty = true;
+        });
+      }
+    });
+
+    // Listen for remote updates; avoid clobbering local edits
+    _storySub = svc.stream.listen((ev) {
       if (ev.story != null && ev.story!.id == widget.story.id) {
-        // update local
+        if (_dirty) return;
         ctrl.story.value = ev.story;
         ctrl.content.value = ev.story!.script;
-        _slugController.text = ev.story!.slug;
-        try {
-          final delta = jsonDecode(ev.story!.script) as List;
-          _quillController.document = Document.fromJson(delta);
-        } catch (e) {
-          _quillController.document = Document();
-          _quillController.document.insert(0, ev.story!.script);
-        }
+        final newDoc = _parseDocument(ev.story!.script);
+        // Update controller without disposing it
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) {
+            _quillController.document = newDoc;
+            _slugController.text = ev.story!.slug;
+            setState(() {});
+          }
+        });
+      }
+    });
+
+    // Keep slug synced
+    _slugController.addListener(() {
+      final s = ctrl.story.value;
+      if (s != null) {
+        ctrl.story.value = s.copyWith(slug: _slugController.text);
       }
     });
   }
 
+  Document _parseDocument(String content) {
+    try {
+      if (content.isEmpty) {
+        return Document();
+      }
+      // Try to parse as JSON first
+      final decoded = jsonDecode(content);
+      if (decoded is List) {
+        return Document.fromJson(decoded);
+      } else if (decoded is Map && decoded.containsKey('ops')) {
+        return Document.fromJson(decoded['ops']);
+      } else {
+        // If it's not a valid Quill format, treat as plain text
+        final doc = Document();
+        doc.insert(0, content);
+        return doc;
+      }
+    } catch (e) {
+      // If parsing fails, treat as plain text
+      final doc = Document();
+      doc.insert(0, content);
+      return doc;
+    }
+  }
+
   @override
   void dispose() {
-    _quillController.dispose();
-    _focusNode.dispose();
-    _scrollController.dispose();
+    _storySub?.cancel();
     _slugController.dispose();
-    _subscription.cancel();
+    _quillController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Script Editor'),
-        actions: [
-          if (canEdit)
-            TextButton(
-              onPressed: () {
-                ctrl.content.value = jsonEncode(
-                  _quillController.document.toDelta().toJson(),
-                );
-                ctrl.save();
-                Get.back();
-              },
-              child: const Text('Save'),
-            ),
-          if (canEdit) const SizedBox(width: 8),
-          if (canEdit)
-            TextButton(
-              onPressed: () {
-                ctrl.content.value = jsonEncode(
-                  _quillController.document.toDelta().toJson(),
-                );
-                ctrl.submit();
-                Get.back();
-              },
-              child: const Text('Submit'),
-            ),
-          if (canEdit) const SizedBox(width: 8),
-          if (canApprove)
-            TextButton(
-              onPressed: () {
-                ctrl.content.value = jsonEncode(
-                  _quillController.document.toDelta().toJson(),
-                );
-                ctrl.approve();
-                Get.back();
-              },
-              child: const Text('Approve'),
-            ),
-        ],
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(12.0),
-        child: Column(
-          children: [
-            TextField(
-              controller: _slugController,
-              readOnly: !canEdit,
-              decoration: const InputDecoration(labelText: 'Slug'),
-              onChanged: canEdit
-                  ? (v) =>
-                        ctrl.story.value = ctrl.story.value!.copyWith(slug: v)
-                  : null,
-            ),
-            const SizedBox(height: 12),
+    return PopScope(
+      canPop: !_dirty,
+      onPopInvoked: (didPop) async {
+        if (didPop || !_dirty) return;
+
+        final shouldLeave =
+            await showDialog<bool>(
+              context: context,
+              builder: (ctx) => AlertDialog(
+                title: const Text('Unsaved changes'),
+                content: const Text(
+                  'You have unsaved changes. Discard and leave?',
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.of(ctx).pop(false),
+                    child: const Text('Cancel'),
+                  ),
+                  TextButton(
+                    onPressed: () => Navigator.of(ctx).pop(true),
+                    child: const Text('Discard'),
+                  ),
+                ],
+              ),
+            ) ??
+            false;
+
+        if (shouldLeave && context.mounted) {
+          Navigator.of(context).pop();
+        }
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Script Editor'),
+          actions: [
             if (canEdit)
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: [
-                    IconButton(
-                      onPressed: () =>
-                          _quillController.formatSelection(Attribute.bold),
-                      icon: Icon(Icons.format_bold),
-                      color:
-                          _quillController
-                                  .getSelectionStyle()
-                                  .attributes['bold'] !=
-                              null
-                          ? Colors.blue
-                          : null,
+              TextButton(
+                onPressed: _saving
+                    ? null
+                    : () async {
+                        setState(() => _saving = true);
+                        try {
+                          final content = jsonEncode(
+                            _quillController.document.toDelta().toJson(),
+                          );
+                          ctrl.content.value = content;
+                          await ctrl.save();
+                          _dirty = false;
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Saved')),
+                            );
+                            Get.back();
+                          }
+                        } catch (e) {
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('Save failed: $e')),
+                            );
+                          }
+                        } finally {
+                          if (mounted) setState(() => _saving = false);
+                        }
+                      },
+                child: const Text('Save'),
+              ),
+            if (canEdit) const SizedBox(width: 8),
+            if (canEdit)
+              TextButton(
+                onPressed: _submitting
+                    ? null
+                    : () async {
+                        setState(() => _submitting = true);
+                        try {
+                          final content = jsonEncode(
+                            _quillController.document.toDelta().toJson(),
+                          );
+                          ctrl.content.value = content;
+                          await ctrl.submit();
+                          _dirty = false;
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Submitted')),
+                            );
+                            Get.back();
+                          }
+                        } catch (e) {
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('Submit failed: $e')),
+                            );
+                          }
+                        } finally {
+                          if (mounted) setState(() => _submitting = false);
+                        }
+                      },
+                child: const Text('Submit'),
+              ),
+            if (canEdit) const SizedBox(width: 8),
+            if (canApprove)
+              TextButton(
+                onPressed: _approving
+                    ? null
+                    : () async {
+                        setState(() => _approving = true);
+                        try {
+                          final content = jsonEncode(
+                            _quillController.document.toDelta().toJson(),
+                          );
+                          ctrl.content.value = content;
+                          await ctrl.approve();
+                          _dirty = false;
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Approved')),
+                            );
+                            Get.back();
+                          }
+                        } catch (e) {
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('Approve failed: $e')),
+                            );
+                          }
+                        } finally {
+                          if (mounted) setState(() => _approving = false);
+                        }
+                      },
+                child: const Text('Approve'),
+              ),
+          ],
+        ),
+        body: Padding(
+          padding: const EdgeInsets.all(12.0),
+          child: Column(
+            children: [
+              TextField(
+                controller: _slugController,
+                readOnly: !canEdit,
+                decoration: const InputDecoration(labelText: 'Slug'),
+              ),
+              const SizedBox(height: 12),
+              if (canEdit)
+                QuillSimpleToolbar(
+                  controller: _quillController,
+                  config: const QuillSimpleToolbarConfig(
+                    showBoldButton: true,
+                    showItalicButton: true,
+                    showUnderLineButton: true,
+                    showStrikeThrough: true,
+                    showInlineCode: true,
+                    showColorButton: true,
+                    showBackgroundColorButton: true,
+                    showClearFormat: true,
+                    showAlignmentButtons: true,
+                    showHeaderStyle: true,
+                    showListNumbers: true,
+                    showListBullets: true,
+                    showListCheck: true,
+                    showCodeBlock: true,
+                    showQuote: true,
+                    showIndent: true,
+                    showLink: true,
+                    showUndo: true,
+                    showRedo: true,
+                  ),
+                ),
+              const SizedBox(height: 12),
+              Expanded(
+                child: Container(
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.grey.shade300),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: QuillEditor.basic(
+                    controller: _quillController,
+                    config: QuillEditorConfig(
+                      readOnly: !canEdit,
                     ),
-                    IconButton(
-                      onPressed: () =>
-                          _quillController.formatSelection(Attribute.italic),
-                      icon: Icon(Icons.format_italic),
-                      color:
-                          _quillController
-                                  .getSelectionStyle()
-                                  .attributes['italic'] !=
-                              null
-                          ? Colors.blue
-                          : null,
-                    ),
-                    IconButton(
-                      onPressed: () =>
-                          _quillController.formatSelection(Attribute.underline),
-                      icon: Icon(Icons.format_underline),
-                      color:
-                          _quillController
-                                  .getSelectionStyle()
-                                  .attributes['underline'] !=
-                              null
-                          ? Colors.blue
-                          : null,
-                    ),
-                    IconButton(
-                      onPressed: () => _quillController.formatSelection(
-                        Attribute.strikeThrough,
-                      ),
-                      icon: Icon(Icons.strikethrough_s),
-                      color:
-                          _quillController
-                                  .getSelectionStyle()
-                                  .attributes['strike'] !=
-                              null
-                          ? Colors.blue
-                          : null,
-                    ),
-                    IconButton(
-                      onPressed: () =>
-                          _quillController.formatSelection(Attribute.ol),
-                      icon: Icon(Icons.list),
-                      color:
-                          _quillController
-                                  .getSelectionStyle()
-                                  .attributes['ol'] !=
-                              null
-                          ? Colors.blue
-                          : null,
-                    ),
-                    IconButton(
-                      onPressed: () =>
-                          _quillController.formatSelection(Attribute.ul),
-                      icon: Icon(Icons.list_alt),
-                      color:
-                          _quillController
-                                  .getSelectionStyle()
-                                  .attributes['ul'] !=
-                              null
-                          ? Colors.blue
-                          : null,
-                    ),
-                    IconButton(
-                      onPressed: () => _quillController.formatSelection(
-                        Attribute.blockQuote,
-                      ),
-                      icon: Icon(Icons.format_quote),
-                      color:
-                          _quillController
-                                  .getSelectionStyle()
-                                  .attributes['blockquote'] !=
-                              null
-                          ? Colors.blue
-                          : null,
-                    ),
-                    IconButton(
-                      onPressed: () =>
-                          _quillController.formatSelection(Attribute.codeBlock),
-                      icon: Icon(Icons.code),
-                      color:
-                          _quillController
-                                  .getSelectionStyle()
-                                  .attributes['code-block'] !=
-                              null
-                          ? Colors.blue
-                          : null,
-                    ),
-                    IconButton(
-                      onPressed: () =>
-                          _quillController.formatSelection(Attribute.link),
-                      icon: Icon(Icons.link),
-                      color:
-                          _quillController
-                                  .getSelectionStyle()
-                                  .attributes['link'] !=
-                              null
-                          ? Colors.blue
-                          : null,
-                    ),
-                  ],
+                  ),
                 ),
               ),
-            if (canEdit) const SizedBox(height: 12),
-            Expanded(
-              child: QuillEditor(
-                controller: _quillController,
-                focusNode: _focusNode,
-                scrollController: _scrollController,
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

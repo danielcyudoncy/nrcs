@@ -2,9 +2,9 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:flutter_quill/flutter_quill.dart';
+import 'package:flutter_quill/flutter_quill.dart' as quill;
 import 'package:nrcs/core/services/story_service.dart';
-import 'package:nrcs/core/theme/app_theme.dart';
+import 'package:nrcs/core/utils/themes/app_theme.dart';
 
 class StoryCreatePage extends StatefulWidget {
   const StoryCreatePage({super.key});
@@ -16,9 +16,7 @@ class StoryCreatePage extends StatefulWidget {
 class _StoryCreatePageState extends State<StoryCreatePage> {
   final _formKey = GlobalKey<FormState>();
   final _slugController = TextEditingController();
-  late QuillController _quillController;
-  late FocusNode _focusNode;
-  late ScrollController _scrollController;
+  late quill.QuillController _quillController;
   String _status = 'pending';
 
   final List<String> _statusOptions = ['pending', 'draft', 'ready'];
@@ -26,17 +24,13 @@ class _StoryCreatePageState extends State<StoryCreatePage> {
   @override
   void initState() {
     super.initState();
-    _quillController = QuillController.basic();
-    _focusNode = FocusNode();
-    _scrollController = ScrollController();
+    _quillController = quill.QuillController.basic();
   }
 
   @override
   void dispose() {
     _slugController.dispose();
     _quillController.dispose();
-    _focusNode.dispose();
-    _scrollController.dispose();
     super.dispose();
   }
 
@@ -54,20 +48,25 @@ class _StoryCreatePageState extends State<StoryCreatePage> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final appColors = theme.extension<AppColors>();
+
     return Scaffold(
-      backgroundColor: AppColors.backgroundDark,
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: AppColors.primaryBlue,
+        backgroundColor: theme.appBarTheme.backgroundColor,
         title: Text(
           'Create New Story',
-          style: AppTheme.headingSmall?.copyWith(color: AppColors.glassWhite),
+          style: theme.appBarTheme.titleTextStyle,
         ),
         actions: [
           TextButton(
             onPressed: _save,
             child: Text(
               'Create',
-              style: AppTheme.button?.copyWith(color: AppColors.glassWhite),
+              style: theme.textTheme.labelLarge?.copyWith(
+                color: theme.colorScheme.onPrimary,
+              ),
             ),
           ),
         ],
@@ -95,14 +94,14 @@ class _StoryCreatePageState extends State<StoryCreatePage> {
               const SizedBox(height: 16),
               DropdownButtonFormField<String>(
                 initialValue: _status,
-                dropdownColor: AppColors.backgroundCard,
+                dropdownColor: theme.cardTheme.color,
                 decoration: const InputDecoration(labelText: 'Status'),
                 items: _statusOptions.map((status) {
                   return DropdownMenuItem(
                     value: status,
                     child: Text(
                       status.toUpperCase(),
-                      style: TextStyle(color: AppColors.glassWhite),
+                      style: TextStyle(color: theme.colorScheme.onSurface),
                     ),
                   );
                 }).toList(),
@@ -113,66 +112,49 @@ class _StoryCreatePageState extends State<StoryCreatePage> {
                 },
               ),
               const SizedBox(height: 16),
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: [
-                    IconButton(
-                      onPressed: () =>
-                          _quillController.formatSelection(Attribute.bold),
-                      icon: Icon(Icons.format_bold),
-                    ),
-                    IconButton(
-                      onPressed: () =>
-                          _quillController.formatSelection(Attribute.italic),
-                      icon: Icon(Icons.format_italic),
-                    ),
-                    IconButton(
-                      onPressed: () =>
-                          _quillController.formatSelection(Attribute.underline),
-                      icon: Icon(Icons.format_underline),
-                    ),
-                    IconButton(
-                      onPressed: () => _quillController.formatSelection(
-                        Attribute.strikeThrough,
-                      ),
-                      icon: Icon(Icons.strikethrough_s),
-                    ),
-                    IconButton(
-                      onPressed: () =>
-                          _quillController.formatSelection(Attribute.ol),
-                      icon: Icon(Icons.list),
-                    ),
-                    IconButton(
-                      onPressed: () =>
-                          _quillController.formatSelection(Attribute.ul),
-                      icon: Icon(Icons.list_alt),
-                    ),
-                    IconButton(
-                      onPressed: () => _quillController.formatSelection(
-                        Attribute.blockQuote,
-                      ),
-                      icon: Icon(Icons.format_quote),
-                    ),
-                    IconButton(
-                      onPressed: () =>
-                          _quillController.formatSelection(Attribute.codeBlock),
-                      icon: Icon(Icons.code),
-                    ),
-                    IconButton(
-                      onPressed: () =>
-                          _quillController.formatSelection(Attribute.link),
-                      icon: Icon(Icons.link),
-                    ),
-                  ],
+              // Quill Toolbar
+              quill.QuillSimpleToolbar(
+                controller: _quillController,
+                config: const quill.QuillSimpleToolbarConfig(
+                  showBoldButton: true,
+                  showItalicButton: true,
+                  showUnderLineButton: true,
+                  showStrikeThrough: true,
+                  showInlineCode: true,
+                  showColorButton: true,
+                  showBackgroundColorButton: true,
+                  showClearFormat: true,
+                  showAlignmentButtons: true,
+                  showHeaderStyle: true,
+                  showListNumbers: true,
+                  showListBullets: true,
+                  showListCheck: true,
+                  showCodeBlock: true,
+                  showQuote: true,
+                  showIndent: true,
+                  showLink: true,
+                  showUndo: true,
+                  showRedo: true,
                 ),
               ),
               const SizedBox(height: 16),
+              // Quill Editor
               Expanded(
-                child: QuillEditor(
-                  controller: _quillController,
-                  focusNode: _focusNode,
-                  scrollController: _scrollController,
+                child: Container(
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: appColors?.accent1 ??
+                          theme.dividerTheme.color ??
+                          Colors.grey,
+                    ),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: quill.QuillEditor.basic(
+                    controller: _quillController,
+                    config: const quill.QuillEditorConfig(
+                      checkBoxReadOnly: false,
+                    ),
+                  ),
                 ),
               ),
             ],
